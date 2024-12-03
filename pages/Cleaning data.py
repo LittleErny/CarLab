@@ -22,30 +22,30 @@ def map_column(df, column_name):
     return mapping
 
 # Prepare data for further interactions
-path = kagglehub.dataset_download("shaunoilund/auto-sales-ebay-germany-random-50k-cleaned")
+@st.cache_resource
+def load_clean_data():
+    path = kagglehub.dataset_download("shaunoilund/auto-sales-ebay-germany-random-50k-cleaned")
+    df = pd.read_csv(f"{path}/autos_random_50k_cleaned.csv")
+    # Drop irrelevant columns
+    irrelevant_columns = ['ab_test', 'date_crawled', 'last_seen', 'ad_created', 'car_name', 'registration_month', 'Unnamed: 0']
+    df = df.drop(columns=irrelevant_columns)
+    # From postal codes, drop everything except the region
+    df['postal_code'] = df['postal_code'].astype(str).apply(lambda x: int(x[0]) if len(x) == 5 else 10)
+    # Map categorical columns to numerical values
+    categorical_columns = ['vehicle_type', 'transmission', 'model', 'fuel_type', 'brand', 'unrepaired_damage']
+    mappings = {col: map_column(df, col) for col in categorical_columns}
+    # List of categorical code columns to exclude
+    categorical_code_columns = ['vehicle_type', 'fuel_type', 'brand', 'unrepaired_damage', 'transmission', 'model', 'postal_code']
 
+    # Exclude these columns, leaving only quantitative features
+    df_quantitative = df.drop(columns=categorical_code_columns)
 
-df = pd.read_csv(f"{path}/autos_random_50k_cleaned.csv")
+    return df, df_quantitative
 
-# Drop irrelevant columns
-irrelevant_columns = ['ab_test', 'date_crawled', 'last_seen', 'ad_created', 'car_name', 'registration_month', 'Unnamed: 0']
-df = df.drop(columns=irrelevant_columns)
-
-# Map categorical columns to numerical values
-categorical_columns = ['vehicle_type', 'transmission', 'model', 'fuel_type', 'brand', 'unrepaired_damage']
-mappings = {col: map_column(df, col) for col in categorical_columns}
-
-# From postal codes, drop everything except the region
-df['postal_code'] = df['postal_code'].astype(str).apply(lambda x: int(x[0]) if len(x) == 5 else 10)
+# Load and clean data
+df, df_quantitative  = load_clean_data()
 
 st.write(df.head())
-
-# List of categorical code columns to exclude
-categorical_code_columns = ['vehicle_type', 'fuel_type', 'brand', 'unrepaired_damage', 'transmission', 'model', 'postal_code']
-
-# Exclude these columns, leaving only quantitative features
-df_quantitative = df.drop(columns=categorical_code_columns)
-
 # Streamlit sidebar for user inputs
 st.sidebar.header("Graph Parameters")
 
