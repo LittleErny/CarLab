@@ -1,10 +1,7 @@
 # imports
-import kagglehub
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 import streamlit as st
-from helpers import initialize_session_variables_if_not_yet, download_dataset, update_postal_codes
+from helpers import initialize_session_variables_if_not_yet, download_dataset
+
 
 # Возможный баг в будущем - кешируя преобразования датафрейма, где мы его берем на вход, кеш-функция может проверить
 # только (не)уникальность ссылки на df, но не проверить (не)уникальность его содержимого, что может привести к
@@ -27,7 +24,37 @@ def reset_dataset():
 # this will initialize them; and do nothing in the opposite case
 initialize_session_variables_if_not_yet()
 
+# Dataset description
+st.title("📊 Auto Sales Dataset Overview")
+
+# Display the dataset
 st.write(st.session_state.df)
 
-st.button("Reset dataset", on_click=reset_dataset)
-st.button("Update postal codes", on_click=update_postal_codes)
+# Reset dataset button
+st.button("🔄 Reset Dataset", on_click=reset_dataset)
+
+st.markdown("""
+---
+
+### About the Dataset
+This dataset contains **~38K random and cleaned records** of vehicle sales on eBay Germany in 2016. 
+
+[📂 View the Dataset on Kaggle](https://www.kaggle.com/datasets/shaunoilund/auto-sales-ebay-germany-random-50k-cleaned)
+
+---
+
+### Columns in the Dataset
+- **`price`**: Price of the vehicle (in EUR). The target variable in this research.
+- **`vehicleType`**: Type of vehicle (e.g., limousine, coupe).
+- **`registration_year`**: Year the vehicle was first registered.
+- **`transmission`**: Transmission type (e.g., manual, automatic).
+- **`power_ps`**: Engine power in PS (metric horsepower).
+- **`model`**: Model of the vehicle.
+- **`odometer_km`**: Mileage of the vehicle (in kilometers).
+- **`fuel_type`**: Type of fuel used (e.g., petrol, diesel).
+- **`brand`**: Vehicle brand (e.g., BMW, Audi).
+- **`unrepaired_damage`**: Indicates if the vehicle has unrepaired damages (`yes`, `no`, or `unknown`).
+- **`postal_code`**: The postal code where the auto was sold.
+
+Note: Some other columns from the initial dataset were excluded, as they were not related to autos.
+""")
