@@ -3,7 +3,10 @@ import streamlit as st
 import pandas as pd
 
 # The names of session variables that needed to be initialized
-COMMON_SESSION_VARIABLES_NAMES = ['df', 'df_mappings', 'df_quantitative']
+COMMON_SESSION_VARIABLES_NAMES = [
+    'df', 'df_mappings', 'df_quantitative',     # common variables
+    'p2_charts', 'p2_chart_counter'             # variables for page 2
+]
 
 KAGGLE_DATASET_PATH = "shaunoilund/auto-sales-ebay-germany-random-50k-cleaned"
 IRRELEVANT_COLUMNS = ['ab_test', 'date_crawled', 'last_seen', 'ad_created', 'car_name', 'registration_month',
@@ -68,3 +71,5 @@ def initialize_session_variables_if_not_yet():
         # st.session_state.df_quantitative = pd.DataFrame()
         st.session_state.df_mappings = {}
 
+        st.session_state.p2_charts = []
+        st.session_state.p2_chart_counter = 0
