@@ -3,7 +3,7 @@ import pandas as pd
 from helpers import initialize_session_variables_if_not_yet
 
 # Hello page
-st.set_page_config(page_title="Start", page_icon="🍌",) # Should change the naming later on
+st.set_page_config(page_title="Start", page_icon="🍌")  # Should change the naming later on
 
 """
 This script uses Streamlit to visualize and analyze a cleaned dataset of car sales from eBay Germany.
@@ -17,18 +17,50 @@ Future improvements:
 
 initialize_session_variables_if_not_yet()
 
-
-st.sidebar.success('This is a success message!')
+st.sidebar.success('This is a success message! 🎉')
 
 st.markdown('''
-## Project Explanation
+## Project Overview 🚗💻
 
-This page should contain an explanation of our project, info, and so on. For now, I will just leave a URL to a dataset that we will use during the project.
+Welcome to our exciting project! Here, you'll find everything you need to dive into a fascinating dataset of car sales from eBay Germany. For now, we're leaving you with a couple of useful links:
 
 ### Resources
 
-- [Dataset](https://www.kaggle.com/datasets/shaunoilund/auto-sales-ebay-germany-random-50k-cleaned/code)
-- [MyGit](https://mygit.th-deg.de/ma06524/sas-thd)
-            
+- [Dataset](https://www.kaggle.com/datasets/shaunoilund/auto-sales-ebay-germany-random-50k-cleaned/code) 📊
+- [MyGit](https://mygit.th-deg.de/ma06524/sas-thd) 🔗
+
 ''')
 
+st.write(
+    "In this project, we present two ways to interact with the app:"
+    " explore the dataset on your own or take a guided tour to see how we analyzed it. "
+    "🚀 **If you're new to data analysis** (or you are the teacher that want to grade this project),"
+    " we highly recommend starting with the beginner-friendly mode. "
+    "We'll walk you through everything step by step. "
+    "💡 But, if you're feeling bold and want to test your skills, you can try out the hardcore mode and compare "
+    "your results with ours! Don't worry, a brief theoretical introduction, as well as the option to edit everything, "
+    "will be available in either mode."
+)
+
+mode = st.radio(
+    "Choose your adventure level:",
+    ("Beginner 🚀", "Hardcore 💪"),
+    index=0 if not st.session_state.hardcore_mode else 1
+)
+
+# Save the selection in session state
+st.session_state.hardcore_mode = (mode == "Hardcore 💪")
+
+# Display a message under the radio buttons
+if mode == "Hardcore 💪":
+    st.markdown(
+        "<p style='font-size: 12px; color: gray;'>Looks like you're ready to tackle the challenge! 💥</p>",
+        unsafe_allow_html=True
+    )
+else:
+    st.markdown(
+        "<p style='font-size: 12px; color: gray;'>It's okay to start small—every expert was once a beginner! 😊</p>",
+        unsafe_allow_html=True
+    )
+
+st.write("Regardless of what you choose, we strongly recommend that you do not skip pages and go in order. Good luck!")

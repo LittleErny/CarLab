@@ -4,8 +4,8 @@ import pandas as pd
 
 # The names of session variables that needed to be initialized
 COMMON_SESSION_VARIABLES_NAMES = [
-    'df', 'df_mappings', 'df_quantitative',     # common variables
-    'p2_charts', 'p2_chart_counter'             # variables for page 2
+    'df', 'df_mappings', 'df_quantitative', 'hardcore_mode',    # common variables
+    'p2_charts', 'p2_chart_counter', 'p2_editing_mode'                             # variables for page 2
 ]
 
 KAGGLE_DATASET_PATH = "shaunoilund/auto-sales-ebay-germany-random-50k-cleaned"
@@ -13,6 +13,10 @@ IRRELEVANT_COLUMNS = ['ab_test', 'date_crawled', 'last_seen', 'ad_created', 'car
                       'Unnamed: 0']
 CATEGORICAL_COLUMNS = ['vehicle_type', 'transmission', 'model', 'fuel_type', 'brand', 'unrepaired_damage']
 NON_NUMERICAL_COLUMNS = CATEGORICAL_COLUMNS + ['postal_code']
+
+# All the columns minus non-numerical
+NUMERICAL_COLUMNS = ["price_EUR", "registration_year", "power_ps", "odometer_km"]
+
 
 
 # Downloads dataset from Kaggle
@@ -64,6 +68,8 @@ def create_quantitative_dataset():
 def initialize_session_variables_if_not_yet():
     # if any of session variables is not initialized, do it
     if any(map(lambda x: x not in st.session_state, COMMON_SESSION_VARIABLES_NAMES)):
+        # print(list(filter(lambda x: x not in st.session_state, COMMON_SESSION_VARIABLES_NAMES)))
+        # print("Initializing the session variables")
         # Just empty in the very beginning; should be downloaded in the "1_Dataset.py" page
         st.session_state.df = download_dataset()
         st.session_state.df_quantitative = None
@@ -71,5 +77,8 @@ def initialize_session_variables_if_not_yet():
         # st.session_state.df_quantitative = pd.DataFrame()
         st.session_state.df_mappings = {}
 
+        st.session_state.hardcore_mode = False
+
         st.session_state.p2_charts = []
         st.session_state.p2_chart_counter = 0
+        st.session_state.p2_editing_mode = False
