@@ -5,7 +5,7 @@ import pandas as pd
 # The names of session variables that needed to be initialized
 COMMON_SESSION_VARIABLES_NAMES = [
     'df', 'df_mappings', 'df_quantitative', 'hardcore_mode',    # common variables
-    'p2_charts', 'p2_chart_counter', 'p2_editing_mode'                             # variables for page 2
+    'p2_items', 'p2_chart_counter', 'p2_editing_mode'                             # variables for page 2
 ]
 
 KAGGLE_DATASET_PATH = "shaunoilund/auto-sales-ebay-germany-random-50k-cleaned"
@@ -16,7 +16,6 @@ NON_NUMERICAL_COLUMNS = CATEGORICAL_COLUMNS + ['postal_code']
 
 # All the columns minus non-numerical
 NUMERICAL_COLUMNS = ["price_EUR", "registration_year", "power_ps", "odometer_km"]
-
 
 
 # Downloads dataset from Kaggle
@@ -50,22 +49,14 @@ def map_column(df, column_name):
     return mapping
 
 
-@st.cache_data
-def create_quantitative_dataset():
-    df = download_dataset()
-    # Shorten postal codes(as exact postal code is mostly irrelevant)
-    update_postal_codes()
-
-    # Map categorical columns to numerical values
-    mappings = {col: map_column(df, col) for col in CATEGORICAL_COLUMNS}
-
+def create_quantitative_dataset(df):
     # Exclude these columns, leaving only quantitative features
     df_quantitative = df.drop(columns=NON_NUMERICAL_COLUMNS)
 
     return df_quantitative
 
 
-def initialize_session_variables_if_not_yet():
+def initialize_global_session_variables_if_not_yet():
     # if any of session variables is not initialized, do it
     if any(map(lambda x: x not in st.session_state, COMMON_SESSION_VARIABLES_NAMES)):
         # print(list(filter(lambda x: x not in st.session_state, COMMON_SESSION_VARIABLES_NAMES)))
@@ -79,6 +70,8 @@ def initialize_session_variables_if_not_yet():
 
         st.session_state.hardcore_mode = False
 
-        st.session_state.p2_charts = []
+        st.session_state.p2_items = {}     # key - id of the item; value - the item
         st.session_state.p2_chart_counter = 0
         st.session_state.p2_editing_mode = False
+
+
