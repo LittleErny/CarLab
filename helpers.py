@@ -4,8 +4,7 @@ import pandas as pd
 
 # The names of session variables that needed to be initialized
 COMMON_SESSION_VARIABLES_NAMES = [
-    'df', 'df_mappings', 'df_quantitative', 'hardcore_mode',    # common variables
-    'p2_items', 'p2_chart_counter', 'p2_editing_mode'                             # variables for page 2
+    'df', 'df_mappings', 'df_quantitative', 'hardcore_mode',  # common variables
 ]
 
 KAGGLE_DATASET_PATH = "shaunoilund/auto-sales-ebay-germany-random-50k-cleaned"
@@ -69,9 +68,3 @@ def initialize_global_session_variables_if_not_yet():
         st.session_state.df_mappings = {}
 
         st.session_state.hardcore_mode = False
-
-        st.session_state.p2_items = {}     # key - id of the item; value - the item
-        st.session_state.p2_chart_counter = 0
-        st.session_state.p2_editing_mode = False
-
-

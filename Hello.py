@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from helpers import initialize_session_variables_if_not_yet
+from helpers import initialize_global_session_variables_if_not_yet
 
 # Hello page
 st.set_page_config(page_title="Start", page_icon="🍌")  # Should change the naming later on
@@ -15,7 +15,7 @@ Future improvements:
 - Provide detailed explanations for numerical data correlations with categorical variables to improve readability.
 """
 
-initialize_session_variables_if_not_yet()
+initialize_global_session_variables_if_not_yet()
 
 st.sidebar.success('This is a success message! 🎉')
 

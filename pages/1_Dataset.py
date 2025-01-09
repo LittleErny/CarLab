@@ -1,6 +1,6 @@
 # imports
 import streamlit as st
-from helpers import initialize_session_variables_if_not_yet, download_dataset
+from helpers import initialize_global_session_variables_if_not_yet, download_dataset
 
 
 # Возможный баг в будущем - кешируя преобразования датафрейма, где мы его берем на вход, кеш-функция может проверить
@@ -22,7 +22,7 @@ def reset_dataset():
 
 # In case this page was the first to be load by the user in the whole application,
 # this will initialize them; and do nothing in the opposite case
-initialize_session_variables_if_not_yet()
+initialize_global_session_variables_if_not_yet()
 
 # Dataset description
 st.title("📊 Auto Sales Dataset Overview")
