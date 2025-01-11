@@ -48,9 +48,11 @@ st.write("---")
 st.write("#### Example: Proper Implementation")
 st.write("This implementation ensures immediate synchronization of state without requiring additional interaction.")
 
+
 # Functions to handle changes for each input element
 def update_session_state(key):
     st.session_state[key] = st.session_state[f"temp_{key}"]
+
 
 # Initialize session states for the elements
 radio_key = "radio"

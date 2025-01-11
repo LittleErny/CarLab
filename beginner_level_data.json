@@ -1,0 +1,17 @@
+{
+    "0": {
+        "type": "CHART",
+        "title": "Correlation Heatmap of Quantitative parameters",
+        "chart_type": "ChartTypes.CORRELATION_HEATMAP",
+        "amount_of_params": "more",
+        "x": "price_EUR",
+        "y": "price_EUR",
+        "z": "price_EUR",
+        "high_res_mode": false
+    },
+    "1": {
+        "type": "MD_BOX",
+        "content": "From this we can make the following outcomes:\n* The biggest correlation can be seen between ``power_bs`` and ``price_EUR`` - the more powerful car is, the more it costs.\n* Oppositely, the higher пробег на машине is, the less it costs. So, the bigger ``odometer_km`` is, the lower ``price_EUR`` is.\n* Additionally, the newer car is, the more it costs. Or, the bigger ``registration_year`` is, the bigger ``price_EUR`` is.\n* Also, the newer car is, the less километраж it has, which is pretty logical.\n* There is also a small correlation between ``power_bs`` and ``registration_year`` - new cars tend to be more powerful than older\n* And obviouthere is no correlation",
+        "mode": "MdBoxModes.VIEW"
+    }
+}

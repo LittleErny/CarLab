@@ -5,6 +5,7 @@ from enum import Enum
 import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
+import json
 from random import randint
 
 # Import from my own files
@@ -71,6 +72,12 @@ class MdBoxModes(Enum):
     VIEW = 1
     EDIT = 2
 
+    def __eq__(self, other):
+        # Due to Streamlit behavior with lots of reloading & reinitializing of some pages, this class is recreated
+        # several times, although it should be Singleton. This is why Enum-s should not be used with "is" operator,
+        # instead the __eq__() method (which is just "==" operator) should be used.
+        return str(self) == str(other)
+
 
 class DashboardItem(ABC):
     """Abstract class for all the Dashboard elements."""
@@ -84,6 +91,22 @@ class DashboardItem(ABC):
     def render(self, pos_id):
         """Renders this item from the very beginning to the very end."""
         pass
+
+    def __setitem__(self, key, value):
+        setattr(self, key, value)  # Dynamic setter for DashboardItem
+
+    def __getitem__(self, key):
+        return getattr(self, key)  # Dynamic getter for DashboardItem
+
+    def __str__(self):
+        # Include type in the serialized JSON
+        return json.dumps(
+            {
+                "type": self.get_type().name,
+                **{k: v for k, v in self.__dict__.items() if k not in ["on_change_function", "df"]},
+            },
+            default=str,  # Handle non-serializable types
+        )
 
 
 class ChartItem(DashboardItem):
@@ -117,16 +140,10 @@ class ChartItem(DashboardItem):
         """How this object is shown while debugging."""
         return str(self)
 
-    def __str__(self):
-        """A brief info about the chart"""
-        return (f'ChartItem object of type **{self.chart_type}** with title '
-                f'"**{self.title}**" and **{self.amount_of_params}** parameters.')
-
-    def __setitem__(self, key, value):
-        setattr(self, key, value)  # Dynamic setter for ChartItem
-
-    def __getitem__(self, key):
-        return getattr(self, key)  # Dynamic getter for ChartItem
+    # def __str__(self):
+    #     """A brief info about the chart"""
+    #     return (f'ChartItem object of type **{self.chart_type}** with title '
+    #             f'"**{self.title}**" and **{self.amount_of_params}** parameters.')
 
     def render(self, pos_id):  # We take new id for rendering and do not store it in __init__(), as it might be changed
         """Renders everything about this chart in the Streamlit app."""
@@ -331,7 +348,6 @@ class ChartItem(DashboardItem):
         Render a chart based on the chart type and parameters.
         (The result is cached to avoid redundant recalculations if the chart is not modified.) not yet
 
-        :param df: Input DataFrame used to generate the chart.
         :return: The rendered chart object.
         """
 
@@ -378,7 +394,14 @@ class ChartItem(DashboardItem):
                 raise ValueError(f"The chart_type of ChartItem object is unknown. Got: {self.chart_type}")
 
         else:
-            pass  # TODO: other types of charts
+            if self.chart_type == ChartTypes.CORRELATION_HEATMAP:
+                corr_matrix = df[NUMERICAL_COLUMNS].corr()  # Only numerical params can be used here
+                sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap="coolwarm", ax=ax)
+                plt.title("Correlation Heatmap")
+            else:
+                raise ValueError(
+                    f"The chart_type of ChartItem object is unknown or unsupported for more than 2 parameters. Got: {self.chart_type}")
+            # pass  # TODO: other types of charts
 
         # Save the image, close all the environment, and pass the image back
         buf = io.BytesIO()
@@ -404,7 +427,7 @@ class ChartItem(DashboardItem):
 
             # check if the graph type can be chosen when we have only 1 graph param
             if not any(list(map(lambda x: ChartTypes.from_string(x) == self.chart_type, LIST_GRAPHS_1_VAR))):
-                print("BOXPLOT WAS SET DURING VALIDATION")
+                # print("BOXPLOT WAS SET DURING VALIDATION")
                 self.chart_type = ChartTypes.BOXPLOT  # set to the basic one
 
             # then check the conflict btw chart_type and the type of parameter
@@ -419,15 +442,25 @@ class ChartItem(DashboardItem):
 
             # check if the graph type can be chosen when we have 2 graph params (axis)
             if not any(list(map(lambda x: ChartTypes.from_string(x) == self.chart_type, LIST_GRAPHS_2_VAR))):
-                print("Scatter WAS SET DURING VALIDATION")
                 self.chart_type = ChartTypes.SCATTER  # set to the basic one
 
+        elif self.amount_of_params == "more":
+            # check if the current graph type can be chosen when we have 3 or more graph params (axis)
+            if not any(list(map(lambda x: ChartTypes.from_string(x) == self.chart_type, LIST_GRAPHS_3_OR_MORE_VAR))):
+                # Set the 1st possible option
+                self.chart_type = ChartTypes.CORRELATION_HEATMAP
 
-# TODO!!!
+        else:
+            raise ValueError(f"Unexpected amount of params during Chart validation: "
+                             f"expected 1, 2, or 'more'; got {self.amount_of_params}")
+
+
 class MDBoxItem(DashboardItem):
-    def __init__(self, content=SAMPLE_MD_TEXT):
-        self.content = content
-        self.mode = MdBoxModes.VIEW  # No editor is shown
+    def __init__(self, on_change_function, content=SAMPLE_MD_TEXT):
+
+        self.content: str = content
+        self.mode: MdBoxModes = MdBoxModes.VIEW  # No editor is shown
+        self.on_change_function = on_change_function
 
     def enable_editing_mode(self):
         self.mode = MdBoxModes.EDIT
@@ -435,11 +468,38 @@ class MDBoxItem(DashboardItem):
     def disable_editing_mode(self):
         self.mode = MdBoxModes.VIEW
 
+    def get_editing_mode_state(self):
+        return self.mode
+
     def update_content(self, new_content):
         self.content = new_content
 
-    def render(self):
-        print("rendering..")
+    def render(self, pos_id):
+
+        def disable_edit_mode_before_saving_res(on_change_function, *args):
+            self.disable_editing_mode()
+            on_change_function(*args)
+
+        if st.button("\U0001F58B\ufe0f Edit", key=f"md_enable_edit_button_{pos_id}"):
+            self.enable_editing_mode()
+
+        if self.mode == MdBoxModes.VIEW:
+            # Just show the text if we want to just watch it
+            st.markdown(self.content)
+
+        elif self.mode == MdBoxModes.EDIT:
+            # Show the editable field
+            st.text_area("Markdown Input", self.content,
+                         key=f"content_{pos_id}",
+                         on_change=disable_edit_mode_before_saving_res,
+                         args=(self.on_change_function, pos_id, "content", f"content_{pos_id}")
+                         )
+
+        else:
+            raise ValueError(f"Unknown mode of MDBox on position {pos_id}: {self.mode}")
+
+    def get_type(self) -> DashboardItemTypes:
+        return DashboardItemTypes.MD_BOX
 
 
 class DashboardManager:
@@ -461,37 +521,41 @@ class DashboardManager:
     def __init__(self, page_number):
         pass  # Do nothing here as everything is already done in __new__()
 
-    def __str__(self):
-        # Just for easier debugging
-        return '\n'.join([item.__dict__ for item in self.items])
-
-    def get_items(self):
-        return self.items.items()
-
     def is_empty(self):
         return len(self.items) == 0
 
-    def create_item(self, item_type: DashboardItemTypes, *args, **kwargs):
+    def create_item(self, item_type: DashboardItemTypes, item_pos: int, *args, **kwargs):
         """
         Factory method for creating items.
 
-        :param item_type: The item type (e.g. 'chart' or 'md_box').
+        :param item_type: The item type (e.g. DashboardItemTypes.CHART).
+        :item_pos: The position of the item, after which new item will be placed.
         :param kwargs: Parameters for the constructor.
         :return: The created item instance.
         """
-        # print("creating some item", item_type, args, kwargs)
+
+
+        manager_items = [value for key, value in sorted(self.items.items(), key=lambda x: x[0])]
+
+        new_item: DashboardItem
 
         if item_type == DashboardItemTypes.CHART:
-            new_chart_item = ChartItem(id=self.amount_of_items, *args, **kwargs)
-            self.items[self.amount_of_items] = new_chart_item
-            self.amount_of_items += 1
 
-            return new_chart_item
+            new_item = ChartItem(id=self.amount_of_items, *args, **kwargs)
+            # self.items[self.amount_of_items] = new_chart_item
+
         elif item_type == DashboardItemTypes.MD_BOX:
-            # TODO: the process of creating MD box
-            return MDBoxItem(**kwargs)
+
+            new_item = MDBoxItem(**kwargs)
+            # self.items[self.amount_of_items] = new_mdbox_item
+
         else:
             raise ValueError(f"Unknown item type: {item_type}")
+
+        self.amount_of_items += 1
+        manager_items.insert(item_pos + 1, new_item)
+        self.items = {i: item for i, item in enumerate(manager_items)}
+        return new_item
 
     def remove_item(self, item_id):
         """Remove item."""
@@ -522,7 +586,50 @@ class DashboardManager:
             raise ValueError("Both item IDs must exist in the items dictionary")
         self.items[item1_id], self.items[item2_id] = self.items[item2_id], self.items[item1_id]
 
-    def print_items(self):
-        """Print info about all the elements."""
-        for item_id, item in self.items.items():
-            print(f"ID: {item_id}, Type: {type(item).__name__}")
+    def save_to_json(self, filepath: str):
+        """
+        Saves the current state of the DashboardManager to a JSON file.
+
+        :param filepath: Path to the JSON file.
+        """
+        items_data = {
+            item_id: json.loads(str(item)) for item_id, item in self.items.items()
+        }
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump(items_data, f, indent=4, ensure_ascii=False)
+
+    def load_from_json(self, on_change_function, df, filepath: str):
+        """
+        Loads the state of the DashboardManager from a JSON file.
+
+        :param filepath: Path to the JSON file.
+        """
+
+        with open(filepath, "r", encoding="utf-8") as f:
+            items_data = json.load(f)
+
+        self.items.clear()
+
+        for item_id, item_data in items_data.items():
+            item_type = DashboardItemTypes[item_data["type"]]  # Extract the item type
+            del item_data["type"]  # Remove type from the data as it's used for initialization
+            if item_type == DashboardItemTypes.CHART:
+                new_item = ChartItem(id=int(item_id), on_change_function=on_change_function, df=df)
+                for key, value in item_data.items():
+                    new_item[key] = value
+            elif item_type == DashboardItemTypes.MD_BOX:
+                new_item = MDBoxItem(on_change_function=on_change_function)
+                for key, value in item_data.items():
+                    new_item[key] = value
+            else:
+                raise ValueError(f"Unsupported item type: {item_type}")
+            self.items[int(item_id)] = new_item
+
+        st.rerun()
+
+    def __str__(self):
+        """
+        Returns a JSON string representing the current state of the manager.
+        """
+        items_data = {item_id: json.loads(str(item)) for item_id, item in self.items.items()}
+        return json.dumps(items_data, indent=4, ensure_ascii=False)

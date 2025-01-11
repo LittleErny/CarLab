@@ -2,6 +2,11 @@ import streamlit as st
 import pandas as pd
 from helpers import initialize_global_session_variables_if_not_yet
 
+
+def change_difficulty_level():
+    st.session_state.hardcore_mode = (st.session_state.difficulty_level == "Hardcore 💪")
+
+
 # Hello page
 st.set_page_config(page_title="Start", page_icon="🍌")  # Should change the naming later on
 
@@ -42,17 +47,16 @@ st.write(
     "will be available in either mode."
 )
 
-mode = st.radio(
+st.radio(
     "Choose your adventure level:",
     ("Beginner 🚀", "Hardcore 💪"),
+    key="difficulty_level",
+    on_change=change_difficulty_level,
     index=0 if not st.session_state.hardcore_mode else 1
 )
 
-# Save the selection in session state
-st.session_state.hardcore_mode = (mode == "Hardcore 💪")
-
 # Display a message under the radio buttons
-if mode == "Hardcore 💪":
+if st.session_state.hardcore_mode:
     st.markdown(
         "<p style='font-size: 12px; color: gray;'>Looks like you're ready to tackle the challenge! 💥</p>",
         unsafe_allow_html=True
@@ -64,3 +68,4 @@ else:
     )
 
 st.write("Regardless of what you choose, we strongly recommend that you do not skip pages and go in order. Good luck!")
+st.write(st.session_state.hardcore_mode)
