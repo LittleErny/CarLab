@@ -1,30 +1,33 @@
 version: "3.1"
 
 stories:
-
-- story: happy path
+- story: User greets and provides details
   steps:
   - intent: greet
   - action: utter_greet
-  - intent: mood_great
-  - action: utter_happy
+  - intent: provide_details
+  - action: utter_ask_budget
 
-- story: sad path 1
+- story: User provides budget
   steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: mood_unhappy
-  - action: utter_cheer_up
-  - action: utter_did_that_help
-  - intent: affirm
-  - action: utter_happy
+  - intent: provide_budget
+  - action: action_provide_car_recommendation
 
-- story: sad path 2
+- story: User requests car advice directly
   steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: mood_unhappy
-  - action: utter_cheer_up
-  - action: utter_did_that_help
-  - intent: deny
+  - intent: request_car_advice
+  - action: utter_ask_details
+  - intent: provide_details
+  - action: utter_ask_budget
+  - intent: provide_budget
+  - action: action_provide_car_recommendation
+
+- story: User says thank you
+  steps:
+  - intent: thank_you
+  - action: utter_thank_you
+
+- story: User says goodbye
+  steps:
+  - intent: goodbye
   - action: utter_goodbye
