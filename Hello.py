@@ -68,4 +68,3 @@ else:
     )
 
 st.write("Regardless of what you choose, we strongly recommend that you do not skip pages and go in order. Good luck!")
-st.write(st.session_state.hardcore_mode)

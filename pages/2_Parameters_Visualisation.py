@@ -1,9 +1,13 @@
-import streamlit as st
-import matplotlib.pyplot as plt
-import seaborn as sns
-from helpers import initialize_global_session_variables_if_not_yet, NUMERICAL_COLUMNS, create_quantitative_dataset
-from DashboardManager import *
 import os
+import streamlit as st
+
+from DashboardManager.ChartItem import ChartItem
+from DashboardManager.DashboardItem import DashboardItem
+from DashboardManager.DashboardManagerEnums import ChartTypes, DashboardItemTypes
+from DashboardManager.MDBoxItem import MDBoxItem
+from DashboardManager.DashboardManager import DashboardManager
+from helpers import initialize_global_session_variables_if_not_yet
+
 
 PAGE_NUMBER = os.path.basename(__file__).split("_")[0]  # The number in front of the filename
 

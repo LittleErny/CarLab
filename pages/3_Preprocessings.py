@@ -1,5 +1,5 @@
 import streamlit as st
-from helpers import initialize_session_variables_if_not_yet, CATEGORICAL_COLUMNS, NUMERICAL_COLUMNS
+from helpers import initialize_global_session_variables_if_not_yet, CATEGORICAL_COLUMNS, NUMERICAL_COLUMNS
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -8,7 +8,7 @@ import seaborn as sns
 
 # In case this page was the first to be load by the user in the whole application,
 # this will initialize them; and do nothing in the opposite case
-initialize_session_variables_if_not_yet()
+initialize_global_session_variables_if_not_yet()
 
 
 # Helper function to remove outliers
