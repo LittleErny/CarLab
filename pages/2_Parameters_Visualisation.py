@@ -23,7 +23,6 @@ def update_item_state(item_id: int, what_to_update: str, changed_field_key: str)
         manager.items[item_id][what_to_update] = ChartTypes.from_string(st.session_state[changed_field_key])
     else:
         manager.items[item_id][what_to_update] = st.session_state[changed_field_key]
-    # print("After update:", manager.items)
 
 
 def create_some_item(item_type, item_pos, *args, **kwargs):

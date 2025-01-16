@@ -7,9 +7,10 @@ SAMPLE_MD_TEXT = "You can edit this md text by pressing **edit** button"
 
 
 class MDBoxItem(DashboardItem):
-    def __init__(self, on_change_function, content=SAMPLE_MD_TEXT):
+    def __init__(self, on_change_function, manager_page_number, content=SAMPLE_MD_TEXT):
 
         self.content: str = content
+        self.manager_page_number = manager_page_number
         self.mode: MdBoxModes = MdBoxModes.VIEW  # No editor is shown
         self.on_change_function = on_change_function
 
@@ -31,7 +32,7 @@ class MDBoxItem(DashboardItem):
             self.disable_editing_mode()
             on_change_function(*args)
 
-        if st.button("\U0001F58B\ufe0f Edit", key=f"md_enable_edit_button_{pos_id}"):
+        if st.button("\U0001F58B\ufe0f Edit", key=f"md_enable_edit_button_{id(self)}_{pos_id}"):
             self.enable_editing_mode()
 
         if self.mode == MdBoxModes.VIEW:

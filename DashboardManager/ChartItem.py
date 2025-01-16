@@ -1,18 +1,23 @@
+import hashlib
+
 import streamlit as st
 from matplotlib import pyplot as plt
+import pandas as pd
 import seaborn as sns
 import io
+import weakref
 
 from DashboardManager.DashboardItem import DashboardItem
 from DashboardManager.DashboardManagerEnums import ChartTypes, DashboardItemTypes
-from helpers import NUMERICAL_COLUMNS
+from helpers import NUMERICAL_COLUMNS, CATEGORICAL_COLUMNS
 
 # Some constants
-LIST_GRAPHS_1_VAR = ["Boxplot", "Histogram", "KDE"]
-LIST_GRAPHS_2_VAR = ["Scatter", "Line", "Bar"]
-LIST_GRAPHS_3_OR_MORE_VAR = ["Correlation Heatmap", "Pairplot", "3D Scatter",
-                             "Parallel Coordinates", "Pivot Table Heatmap",
-                             "Missing Data Heatmap"]
+LIST_GRAPHS_1_VAR = [ChartTypes.BOXPLOT, ChartTypes.HISTOGRAM, ChartTypes.KDE]
+LIST_GRAPHS_2_VAR = [ChartTypes.SCATTER, ChartTypes.LINE, ChartTypes.BAR, ChartTypes.CATEGORICAL_BOXPLOTS]
+LIST_GRAPHS_3_OR_MORE_VAR = [ChartTypes.CORRELATION_HEATMAP, ChartTypes.PAIRPLOT, ChartTypes.THREE_D_SCATTER,
+                             # "Parallel Coordinates", "Pivot Table Heatmap",
+                             # "Missing Data Heatmap"
+                             ]
 
 
 class ChartItem(DashboardItem):
@@ -39,7 +44,8 @@ class ChartItem(DashboardItem):
         self.x = df.columns[0]
         self.y = df.columns[0]  # Initialize y and z in advance, even if they are not used
         self.z = df.columns[0]
-        self.df = df
+        self.df_ref = weakref.ref(df)
+        # print("ChartItem", self.df_ref)
         self.high_res_mode = False
 
     def __repr__(self):
@@ -50,6 +56,28 @@ class ChartItem(DashboardItem):
     #     """A brief info about the chart"""
     #     return (f'ChartItem object of type **{self.chart_type}** with title '
     #             f'"**{self.title}**" and **{self.amount_of_params}** parameters.')
+
+    def _calculate_hash(self):
+        """
+        Вычисляет хэш для текущих параметров графика, чтобы использовать его для кэширования.
+        """
+        # Хэшируем данные из DataFrame, чтобы отследить изменения данных
+        df = self.df_ref()
+        df_hash = hashlib.md5(pd.util.hash_pandas_object(df, index=True).values.tobytes()).hexdigest()
+        # print("df_hash:", self.df_ref, df_hash, len(df))
+        # Собираем параметры для хэширования
+        params = (
+            df_hash,
+            self.chart_type,
+            self.amount_of_params,
+            self.x,
+            self.y,
+            self.z,
+            self.high_res_mode
+        )
+
+        # Создаем хэш из параметров
+        return hashlib.md5(str(params).encode('utf-8')).hexdigest()
 
     def render(self, pos_id):  # We take new id for rendering and do not store it in __init__(), as it might be changed
         """Renders everything about this chart in the Streamlit app."""
@@ -78,6 +106,7 @@ class ChartItem(DashboardItem):
                 raise ValueError(f'Unknown axis_name: expected "x", "y", or "z"; but received {axis_name}.')
 
         # Check whether all the chart params are valid, and reset the wrong
+        df = self.df_ref()
         self.validate_chart()
 
         # TODO: Automatically generate the names of the graphs(LLM?..)
@@ -121,126 +150,92 @@ class ChartItem(DashboardItem):
 
             # Then choose the type of graph
             if self.amount_of_params == 1:
-                try:
-                    st.selectbox("Chart Type (1 Param)", LIST_GRAPHS_1_VAR,
-                                 index=LIST_GRAPHS_1_VAR.index(str(self.chart_type)),
-                                 key=f"chart_type_{pos_id}",
-                                 on_change=self.on_change_function,
-                                 args=(pos_id, "chart_type", f"chart_type_{pos_id}")
-                                 )
-                except ValueError as err:
-                    # There is a possible scenario when user changes the number of params, and the
-                    # ValueError in the "index" param arises, as the graph types are different for
-                    # 1 and 2-parameter graphs (or with even bigger amount of params)
-                    # TODO: This part should be deleted after finishing implementing ChartItem.validate_chart()!!!!!!
-                    new_chart_type = ChartTypes.from_string(
-                        st.selectbox("Chart Type (1 Param)", LIST_GRAPHS_1_VAR,
-                                     index=0,  # In such a case we just use "any"
-                                     key=f"chart_type_{pos_id}",
-                                     on_change=self.on_change_function,
-                                     args=(pos_id, "chart_type", f"chart_type_{pos_id}")
-                                     ))
-                    self.chart_type = new_chart_type
+                st.selectbox("Chart Type (1 Param)",
+                             [i.value for i in LIST_GRAPHS_1_VAR],
+                             index=LIST_GRAPHS_1_VAR.index(self.chart_type),
+                             key=f"chart_type_{pos_id}",
+                             on_change=self.on_change_function,
+                             args=(pos_id, "chart_type", f"chart_type_{pos_id}")
+                             )
 
                 # Then choose X-axis parameter
                 if self.chart_type is ChartTypes.HISTOGRAM:
                     # For Histogram any parameter can be used
-                    render_axis_selectbox("x", self.df.columns, list(self.df.columns).index(self.x))
+                    render_axis_selectbox("x", df.columns, list(df.columns).index(self.x))
 
                 else:
                     # However, for boxplots and KDEs only numerical parameters are accepted
                     render_axis_selectbox("x", NUMERICAL_COLUMNS, list(NUMERICAL_COLUMNS).index(self.x))
 
             elif self.amount_of_params == 2:
-                try:
-                    st.selectbox("Chart Type (2 Param)", LIST_GRAPHS_2_VAR,
-                                 index=LIST_GRAPHS_2_VAR.index(str(self.chart_type)),
-                                 key=f"chart_type_{pos_id}",
-                                 on_change=self.on_change_function,
-                                 args=(pos_id, "chart_type", f"chart_type_{pos_id}")
-                                 )
-                except ValueError as err:
-                    # There is a possible scenario when user changes the number of params, and the
-                    # ValueError in the "index" param arises, as the graph types are different for
-                    # 1 and 2-parameter graphs (or with even bigger amount of params)
-                    # TODO: This part should be deleted after finishing implementing ChartItem.validate_chart()!!!!!!
-                    new_chart_type = ChartTypes.from_string(
-                        st.selectbox("Chart Type", ["Scatter", "Line", "Bar"],
-                                     index=0,  # In such a case we just use "any"
-                                     key=f"chart_type_{pos_id}",
-                                     on_change=self.on_change_function,
-                                     args=(
-                                         pos_id, "chart_type", f"chart_type_{pos_id}")
-                                     )
-                    )
-                    self.chart_type = new_chart_type
+
+                st.selectbox("Chart Type (2 Param)",
+                             [i.value for i in LIST_GRAPHS_2_VAR],
+                             index=LIST_GRAPHS_2_VAR.index(self.chart_type),
+                             key=f"chart_type_{pos_id}",
+                             on_change=self.on_change_function,
+                             args=(pos_id, "chart_type", f"chart_type_{pos_id}")
+                             )
 
                 # Then choose X-axis parameter
-                render_axis_selectbox("x", self.df.columns, list(self.df.columns).index(self.x))
+                if self.chart_type == ChartTypes.CATEGORICAL_BOXPLOTS:
+                    render_axis_selectbox("x", CATEGORICAL_COLUMNS, CATEGORICAL_COLUMNS.index(self.x))
+                else:
+                    render_axis_selectbox("x", df.columns, list(df.columns).index(self.x))
 
                 # And choose Y-axis parameter
-                render_axis_selectbox("y", self.df.columns, list(self.df.columns).index(self.y))
+                if self.chart_type == ChartTypes.CATEGORICAL_BOXPLOTS:
+                    render_axis_selectbox("y", NUMERICAL_COLUMNS, NUMERICAL_COLUMNS.index(self.y))
+                else:
+                    render_axis_selectbox("y", df.columns, list(df.columns).index(self.y))
 
             else:
                 # If the option "more" is chosen
-                try:
 
-                    st.selectbox("Chart Type (3 or more params)",
-                                 LIST_GRAPHS_3_OR_MORE_VAR,
-                                 index=LIST_GRAPHS_3_OR_MORE_VAR.index(str(self.chart_type)),
-                                 key=f"chart_type_{pos_id}",
-                                 on_change=self.on_change_function,
-                                 args=(pos_id, "chart_type", f"chart_type_{pos_id}")
-                                 )
-                except ValueError as err:
-                    # There is a possible scenario when user changes the number of params, and the
-                    # ValueError in the "index" param arises, as the graph types are different for
-                    # 1 and 2-parameter graphs
-                    # TODO: This part should be deleted after finishing implementing ChartItem.validate_chart()!!!!!!
-                    st.selectbox("Chart Type (3 or more params)",
-                                 LIST_GRAPHS_3_OR_MORE_VAR,
-                                 index=0,
-                                 key=f"chart_type_{pos_id}",
-                                 on_change=self.on_change_function,
-                                 args=(pos_id, "chart_type", f"chart_type_{pos_id}")
-                                 )
+                st.selectbox("Chart Type (3 or more params)",
+                             [i.value for i in LIST_GRAPHS_3_OR_MORE_VAR],
+                             index=LIST_GRAPHS_3_OR_MORE_VAR.index(self.chart_type),
+                             key=f"chart_type_{pos_id}",
+                             on_change=self.on_change_function,
+                             args=(pos_id, "chart_type", f"chart_type_{pos_id}")
+                             )
 
-                if self.chart_type == "Correlation Heatmap":
-                    pass  # Nothing needed to do
+            if self.chart_type == "Correlation Heatmap":
+                pass  # Nothing needed to do
 
-                elif self.chart_type == "Pairplot":
-                    pass  # Nothing needed to do
+            elif self.chart_type == "Pairplot":
+                pass  # Nothing needed to do
 
-                elif self.chart_type == "3D Scatter":
+            elif self.chart_type == "3D Scatter":
 
-                    # Choose X-axis parameter
-                    render_axis_selectbox("x", self.df.columns, list(self.df.columns).index(self.x))
-                    # st.selectbox("X-axis", df.columns, index=list(df.columns).index(item["x"]),
-                    #                          key=f"x_{id}")
-                    # Choose Y-axis parameter
-                    render_axis_selectbox("y", self.df.columns, list(self.df.columns).index(self.y))
-                    # item["y"] = st.selectbox("Y-axis", df.columns, index=list(df.columns).index(item["y"]),
-                    #                          key=f"y_{id}")
-                    # Choose Y-axis parameter
-                    render_axis_selectbox("z", self.df.columns, list(self.df.columns).index(self.z))
-                    # item["z"] = st.selectbox("Z-axis", df.columns, index=list(df.columns).index(item["z"]),
-                    #                          key=f"z_{id}")
-                    # TODO: Probably add some kind of rotator?..
+                # Choose X-axis parameter
+                render_axis_selectbox("x", df.columns, list(df.columns).index(self.x))
+                # st.selectbox("X-axis", df.columns, index=list(df.columns).index(item["x"]),
+                #                          key=f"x_{id}")
+                # Choose Y-axis parameter
+                render_axis_selectbox("y", df.columns, list(df.columns).index(self.y))
+                # item["y"] = st.selectbox("Y-axis", df.columns, index=list(df.columns).index(item["y"]),
+                #                          key=f"y_{id}")
+                # Choose Y-axis parameter
+                render_axis_selectbox("z", df.columns, list(df.columns).index(self.z))
+                # item["z"] = st.selectbox("Z-axis", df.columns, index=list(df.columns).index(item["z"]),
+                #                          key=f"z_{id}")
+                # TODO: Probably add some kind of rotator?..
 
-                elif self.chart_type == "Parallel Coordinates":
-                    pass  # TODO!!!!!
+            elif self.chart_type == "Parallel Coordinates":
+                pass  # TODO!!!!!
 
-                elif self.chart_type == "Pivot Table Heatmap":
-                    pass  # TODO!!!
-                    # pivot_data = df.pivot_table(
-                    #     values=chart_params["value_column"],
-                    #     index=chart_params["row_column"],
-                    #     columns=chart_params["column_column"],
-                    #     aggfunc='mean'
-                    # )
-                    # sns.heatmap(pivot_data, annot=True, cmap="viridis")
-                elif self.chart_type == "Missing Data Heatmap":
-                    pass  # TODO!!!
+            elif self.chart_type == "Pivot Table Heatmap":
+                pass  # TODO!!!
+                # pivot_data = df.pivot_table(
+                #     values=chart_params["value_column"],
+                #     index=chart_params["row_column"],
+                #     columns=chart_params["column_column"],
+                #     aggfunc='mean'
+                # )
+                # sns.heatmap(pivot_data, annot=True, cmap="viridis")
+            elif self.chart_type == "Missing Data Heatmap":
+                pass  # TODO!!!
 
     def get_type(self):
         return DashboardItemTypes.CHART
@@ -259,6 +254,13 @@ class ChartItem(DashboardItem):
 
         self = _self
 
+        # If the hash is already in the cache, return the saved image and width
+        current_hash = self._calculate_hash()
+        if current_hash in st.session_state["chart_hashes"]:
+            # print("Kache used")
+            return (st.session_state["chart_hashes"][current_hash]['buffer'],
+                    st.session_state["chart_hashes"][current_hash]['width'])
+
         if self.high_res_mode:
             fig, ax = plt.subplots(figsize=(30, 18))  # Resolution of 3000х1800 pixels
             width = 3000
@@ -266,7 +268,8 @@ class ChartItem(DashboardItem):
             fig, ax = plt.subplots(figsize=(10, 6))  # Resolution of 1000х600 pixels
             width = 1000
 
-        df = self.df
+        df = self.df_ref()
+        # print("render_chart", self.df_ref, len(df))
 
         if self.high_res_mode:
             # Make the names of categories vertical, so that user can read it when there are a lot of them
@@ -296,6 +299,17 @@ class ChartItem(DashboardItem):
                 sns.lineplot(data=df, x=self.x, y=self.y)
             elif self.chart_type == ChartTypes.BAR:
                 sns.barplot(data=df, x=self.x, y=self.y)
+            elif self.chart_type == ChartTypes.CATEGORICAL_BOXPLOTS:
+                # Assume that X is categorical and Y is not
+                cat_groups = df.groupby(self.x)[self.y].median().sort_values(ascending=False)
+                # Sort the categories on the graph - from the highest median to lowest
+                sns.boxplot(
+                    data=df,
+                    x=self.x,
+                    y=self.y,
+                    order=cat_groups.index,  # order
+                    showfliers=False
+                )
             else:
                 raise ValueError(f"The chart_type of ChartItem object is unknown. Got: {self.chart_type}")
 
@@ -315,6 +329,13 @@ class ChartItem(DashboardItem):
         buf.seek(0)
         plt.close(fig)
         plt.rcdefaults()
+
+        # Save the result in the Kache
+        st.session_state['chart_hashes'][current_hash] = {
+            'buffer': buf,
+            'width': width
+        }
+
         return buf, width
 
     def validate_chart(self):
@@ -332,7 +353,7 @@ class ChartItem(DashboardItem):
         if self.amount_of_params == 1:
 
             # check if the graph type can be chosen when we have only 1 graph param
-            if not any(list(map(lambda x: ChartTypes.from_string(x) == self.chart_type, LIST_GRAPHS_1_VAR))):
+            if not any(list(map(lambda x: x == self.chart_type, LIST_GRAPHS_1_VAR))):
                 # print("BOXPLOT WAS SET DURING VALIDATION")
                 self.chart_type = ChartTypes.BOXPLOT  # set to the basic one
 
@@ -347,12 +368,29 @@ class ChartItem(DashboardItem):
         elif self.amount_of_params == 2:
 
             # check if the graph type can be chosen when we have 2 graph params (axis)
-            if not any(list(map(lambda x: ChartTypes.from_string(x) == self.chart_type, LIST_GRAPHS_2_VAR))):
+            if not any(list(map(lambda x: x == self.chart_type, LIST_GRAPHS_2_VAR))):
+                # print("It was changed..")
                 self.chart_type = ChartTypes.SCATTER  # set to the basic one
+
+            if self.chart_type == ChartTypes.CATEGORICAL_BOXPLOTS:
+
+                # Only (cat + non-cat) are accepted
+                if (self.x in NUMERICAL_COLUMNS and self.y not in NUMERICAL_COLUMNS) or (
+                        self.x not in NUMERICAL_COLUMNS and self.y in NUMERICAL_COLUMNS):
+
+                    # For better picture, X-axis is available for categorical parameter only
+                    if self.y not in NUMERICAL_COLUMNS:
+                        self.x, self.y = self.y, self.x
+
+                elif self.x in NUMERICAL_COLUMNS and self.y in NUMERICAL_COLUMNS:
+                    self.x = CATEGORICAL_COLUMNS[0]
+
+                elif self.x not in NUMERICAL_COLUMNS and self.y not in NUMERICAL_COLUMNS:
+                    self.y = NUMERICAL_COLUMNS[0]
 
         elif self.amount_of_params == "more":
             # check if the current graph type can be chosen when we have 3 or more graph params (axis)
-            if not any(list(map(lambda x: ChartTypes.from_string(x) == self.chart_type, LIST_GRAPHS_3_OR_MORE_VAR))):
+            if not any(list(map(lambda x: x == self.chart_type, LIST_GRAPHS_3_OR_MORE_VAR))):
                 # Set the 1st possible option
                 self.chart_type = ChartTypes.CORRELATION_HEATMAP
 

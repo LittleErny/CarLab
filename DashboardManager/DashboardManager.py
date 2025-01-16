@@ -1,4 +1,6 @@
 # Import libraries
+import weakref
+
 import streamlit as st
 import json
 
@@ -7,6 +9,7 @@ from DashboardManager.DashboardItem import DashboardItem
 from DashboardManager.ChartItem import ChartItem
 from DashboardManager.MDBoxItem import MDBoxItem
 from DashboardManager.DashboardManagerEnums import DashboardItemTypes
+from DashboardManager.PreprocessingItem import PreprocessingItem
 
 
 class DashboardManager:
@@ -18,11 +21,13 @@ class DashboardManager:
         # However it is supposed that the Manager is Singleton for every particular page. So we interrupt
         # The process of creating new instance and return the old one from the st.session_state, if we have one already.
         key = f"p{page_number}_DashboardManager"
+
         if key not in st.session_state:
             instance = super().__new__(cls)
             instance.amount_of_items = 0
             instance.items = {}  # The items(blocks) are stored in dict
             st.session_state[key] = instance
+            instance.page_number = page_number
         return st.session_state[key]
 
     def __init__(self, page_number):
@@ -46,14 +51,19 @@ class DashboardManager:
         new_item: DashboardItem
 
         if item_type == DashboardItemTypes.CHART:
+            print("Manager:", weakref.ref(kwargs["df"]))
 
             new_item = ChartItem(id=self.amount_of_items, *args, **kwargs)
             # self.items[self.amount_of_items] = new_chart_item
 
         elif item_type == DashboardItemTypes.MD_BOX:
 
-            new_item = MDBoxItem(**kwargs)
+            new_item = MDBoxItem(manager_page_number=self.page_number, **kwargs)
             # self.items[self.amount_of_items] = new_mdbox_item
+
+        elif item_type == DashboardItemTypes.PREPROCESSING_BOX:
+
+            new_item = PreprocessingItem(**kwargs)
 
         else:
             raise ValueError(f"Unknown item type: {item_type}")
@@ -68,23 +78,31 @@ class DashboardManager:
         if item_id in self.items:
             del self.items[item_id]
 
-    def move_item_up(self, item_id):
+    def find_next_item_from_above(self, item_id):
         # Suppose there can be situation that there will be spaces in the keys like [0, 1, 3]
         item_keys = sorted(self.items.keys())
         item_pos = item_keys.index(item_id)
         if item_pos == 0:
-            return  # do nothing, as the position is already the highest possible
-        next_item_id = item_keys[item_pos - 1]
-        self.swap_items(item_id, next_item_id)
+            return -1  # The given item is already the highest
+        return item_keys[item_pos - 1]
 
-    def move_item_down(self, item_id):
+    def find_next_item_from_below(self, item_id):
         # Suppose there can be situation that there will be spaces in the keys like [0, 1, 3]
         item_keys = sorted(self.items.keys())
         item_pos = item_keys.index(item_id)
         if item_pos == len(item_keys) - 1:
-            return  # do nothing, as the position is already the lowest possible
-        next_item_id = item_keys[item_pos + 1]
-        self.swap_items(item_id, next_item_id)
+            return -1  # The given item is already the lowest
+        return item_keys[item_pos + 1]
+
+    def move_item_up(self, item_id):
+        next_item_id = self.find_next_item_from_above(item_id)
+        if next_item_id != -1:
+            self.swap_items(item_id, next_item_id)
+
+    def move_item_down(self, item_id):
+        next_item_id = next_item_id = self.find_next_item_from_below(item_id)
+        if next_item_id != -1:
+            self.swap_items(item_id, next_item_id)
 
     def swap_items(self, item1_id, item2_id):
         """Swap two elements."""
@@ -124,7 +142,7 @@ class DashboardManager:
                 for key, value in item_data.items():
                     new_item[key] = value
             elif item_type == DashboardItemTypes.MD_BOX:
-                new_item = MDBoxItem(on_change_function=on_change_function)
+                new_item = MDBoxItem(manager_page_number=self.page_number, on_change_function=on_change_function)
                 for key, value in item_data.items():
                     new_item[key] = value
             else:

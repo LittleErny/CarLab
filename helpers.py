@@ -4,7 +4,8 @@ import pandas as pd
 
 # The names of session variables that needed to be initialized
 COMMON_SESSION_VARIABLES_NAMES = [
-    'df', 'df_mappings', 'df_quantitative', 'hardcore_mode',  # common variables
+    'df', 'df_mappings', 'df_quantitative', 'hardcore_mode', 'chart_hashes',  # common variables
+    'categorical_columns', 'numerical_columns'  # dynamic lists of columns of different types
 ]
 
 KAGGLE_DATASET_PATH = "shaunoilund/auto-sales-ebay-germany-random-50k-cleaned"
@@ -60,11 +61,22 @@ def initialize_global_session_variables_if_not_yet():
     if any(map(lambda x: x not in st.session_state, COMMON_SESSION_VARIABLES_NAMES)):
         # print(list(filter(lambda x: x not in st.session_state, COMMON_SESSION_VARIABLES_NAMES)))
         # print("Initializing the session variables")
-        # Just empty in the very beginning; should be downloaded in the "1_Dataset.py" page
         st.session_state.df = download_dataset()
+
+        # The second is for page 3 and later - can be edited in preprocessing function
+        st.session_state.df2 = download_dataset()
+
         st.session_state.df_quantitative = None
 
         # st.session_state.df_quantitative = pd.DataFrame()
         st.session_state.df_mappings = {}
 
         st.session_state.hardcore_mode = False
+        st.session_state.chart_hashes = {}
+
+        # dynamic lists of columns of different types
+        st.session_state.categorical_columns = CATEGORICAL_COLUMNS.copy()
+        st.session_state.numerical_columns = NUMERICAL_COLUMNS.copy()
+        print("-------------------------------------")
+        print("The App is run.")
+        print("-------------------------------------")
