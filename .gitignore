@@ -1,0 +1,19 @@
+**venv
+
+# PyCharm and IDE
+.idea/
+
+__pycache__*
+*.py[cod]
+
+
+*.log
+*.tmp
+*.swp
+*.bak
+*.orig
+
+*.csv
+*.txt
+backups/
+catboost_info/
