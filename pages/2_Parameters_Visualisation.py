@@ -9,11 +9,6 @@ from DashboardManager.DashboardManager import DashboardManager
 from helpers import initialize_global_session_variables_if_not_yet
 
 
-PAGE_NUMBER = os.path.basename(__file__).split("_")[0]  # The number in front of the filename
-
-
-# TODO: fix the problem with re-rendering heavy charts if they are not edited or created in the first time
-
 # Functions to handle changes for each input element
 def update_item_state(item_id: int, what_to_update: str, changed_field_key: str) -> None:
     # print("error here:", item_id, what_to_update, changed_field_key, manager.items, st.session_state)
@@ -30,13 +25,82 @@ def create_some_item(item_type, item_pos, *args, **kwargs):
     manager.create_item(item_type, item_pos, *args, **kwargs)
 
 
+# -------- Start of the page execution --------
+
+st.set_page_config(page_title="CarLab Parameters Visualisation", page_icon="📊")
+PAGE_NUMBER = os.path.basename(__file__).split("_")[0]  # The number in front of the filename
+
 # In case this page was the first to be load by the user in the whole application,
 # this will initialize them; and do nothing in the opposite case
 initialize_global_session_variables_if_not_yet()
 
+st.write("# Parameters Visualisation")
+st.write("Here you can study the dataset in (almost) every possible way.")
+with st.expander("Brief Instruction:", expanded=False):
+    st.markdown(
+        """
+This page is implemented with ``DashboardManager``, which provides you similar functionality, 
+as the Jupiter Notebook.
+Here you can manage 2 types of blocks - ``Charts`` & ``Markdown Boxes``. 
+
+Don't worry - all the information that you put in is saved - you can safely leave this page and return here later. 
+- - -
+
+#### Charts:
+
+This block let you see and edit charts, that let you see the initial data "from the box". 
+All the graphs you render during the session are also cached - so even if some graph took forever to generate,
+it will not happen at the second time.
+Note that some graphs are not perfect (because of outliers), and it is fixed on the next page.
+
+What you can do:
+- Edit chart title
+- See the chart
+- Edit the number of axis (the number of visualizing parameters)
+- Choose the type of graph
+- Edit the axis selection
+- Set the flag for higher resolution (appr. 3 times higher per dimension)
+
+Note that the higher resolution is, the higher is the rendering time. 
+Also, note that the higher parameters have higher priority in case of conflicts. 
+So, if you choose categorical parameter and then change the graph type to one that accepts only numerical parameters,
+your choice of parameter will be automatically reset. So fill in all the graph information from top to bottom.
+
+- - -
+
+#### MarkDown Boxes:
+
+Probably, the simplest thing ever. It has 2 states - ``edit`` and ``view`` (the 2nd is chosen by default).
+Whenever you want to edit the text, just press **Edit** button. 
+And yeah, the text you input supports Markdown (pretty obvious, I guess).
+
+- - -
+
+#### Common buttons:
+##### Up & Down buttons:
+ 
+You can swap the boxes in the ``DashboardManager`` by pressing the arrows from the right.
+Note that some items are impossible to swap - you will see the notification about this if you try.
+
+- - -
+
+##### Other buttons:
+
+- ``Remove`` - reduces the current box to atoms 
+- ``➕ Add New Chart Below`` - creates new Chart below the current box
+- ``➕ Add New Text Below`` - creates new MarkDown box below the current box
+"""
+    )
+
 # Get some variables from session_state
 df = st.session_state.df
 manager = DashboardManager(PAGE_NUMBER)
+
+if not st.session_state.hardcore_mode and not st.session_state.page_2_was_ever_rendered:
+    st.session_state.page_2_was_ever_rendered = True
+    manager.load_from_json(update_item_state, df,
+                           "dashboard_manager_saves/beginner_level_data_page_2.json",
+                           skip_rerun=False)
 
 # If we do not have any items to show, let the user create the first one
 if manager.is_empty():
@@ -57,7 +121,6 @@ if manager.is_empty():
         args=(DashboardItemTypes.MD_BOX, 0),
         kwargs={"on_change_function": update_item_state}
     )
-
 
 # Render all the items(graphs or MD-boxes) that we have
 for item_id, item in manager.items.items():
@@ -133,12 +196,6 @@ for item_id, item in manager.items.items():
                 args=(DashboardItemTypes.MD_BOX, item_id),
                 kwargs={"on_change_function": update_item_state}
             )
-
-if st.sidebar.button("Save current page state"):
-    manager.save_to_json("beginner_level_data.json")
-
-if st.sidebar.button("Load page from json"):
-    manager.load_from_json(update_item_state, df, "beginner_level_data.json")
 
 # De-comment for debugging
 # st.write(str(manager))

@@ -5,181 +5,168 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# CURRENTLY THIS IS OLD PREPROCESSINGS PAGE
-st.write("# CURRENTLY THIS IS OLD PREPROCESSINGS PAGE")
-# In case this page was the first to be load by the user in the whole application,
-# this will initialize them; and do nothing in the opposite case
+import random
+from faker import Faker
+
+st.set_page_config(page_title="CarLab Faker", page_icon="🎭")
+
+# Initialize Faker
+fake = Faker()
 initialize_global_session_variables_if_not_yet()
 
 
-# Helper function to remove outliers
-def remove_outliers(df, column, method, threshold):
-    if method == 'top':
-        return df[df[column] <= df[column].quantile(1 - threshold / 100)]
-    elif method == 'bottom':
-        return df[df[column] >= df[column].quantile(threshold / 100)]
-    elif method == 'both':
-        lower_bound = df[column].quantile(threshold / 100)
-        upper_bound = df[column].quantile(1 - threshold / 100)
-        return df[(df[column] >= lower_bound) & (df[column] <= upper_bound)]
-    else:
-        return df
+# Functions for data generation
+def generate_random_data(num_rows, odometer_range, price_range):
+    data = []
+    for _ in range(num_rows):
+        row = {
+            "price_EUR": random.randint(*price_range),
+            "vehicle_type": fake.random_element(["cabrio", "kleinwagen", "suv", "kombi", "limousine"]),
+            "registration_year": random.randint(1990, 2022),
+            "transmission": fake.random_element(["manuell", "automatik"]),
+            "power_ps": random.randint(50, 400),
+            "model": fake.random_element(["astra", "andere", "xc_reihe", "mondeo", "a4", "3er", "passat"]),
+            "odometer_km": random.randint(*odometer_range),
+            "fuel_type": fake.random_element(["Unknown", "benzin", "diesel"]),
+            "brand": fake.random_element(["opel", "fiat", "volvo", "ford", "audi", "bmw", "sonstig", "volkswagen"]),
+            "unrepaired_damage": fake.random_element(["ja", "nein", "Unknown"]),
+            "postal_code": random.randint(10000, 99999),
+        }
+        data.append(row)
+    return pd.DataFrame(data)
 
 
-# Title and description
-st.title("Preprocessing Tool")
+def generate_faker_data(num_rows):
+    data = []
+    for _ in range(num_rows):
+        row = {
+            "price_EUR": random.randint(500, 50000),
+            "vehicle_type": fake.random_element(["cabrio", "kleinwagen", "suv", "kombi", "limousine"]),
+            "registration_year": random.randint(1990, 2022),
+            "transmission": fake.random_element(["manuell", "automatik"]),
+            "power_ps": random.randint(50, 400),
+            "model": fake.word(),
+            "odometer_km": random.randint(0, 300000),
+            "fuel_type": fake.random_element(["Unknown", "benzin", "diesel"]),
+            "brand": fake.company(),
+            "unrepaired_damage": fake.random_element(["ja", "nein", "Unknown"]),
+            "postal_code": random.randint(10000, 99999),
+        }
+        data.append(row)
+    return pd.DataFrame(data)
 
-st.markdown("""
-### Data Preprocessing Overview
-This tool allows you to preprocess your dataset interactively. The following steps are available:
-- **Outliers Removal**: Identify and remove outliers to improve model accuracy and reduce biases.
-- **Label Encoding**: Convert categorical variables into numerical representations.
-- **Scaling**: Normalize or standardize numerical features for better model performance.
-- **Removing Unnecessary Columns**: Remove irrelevant columns or filter rows based on specific categories.
-""")
 
-df = st.session_state.df
+def generate_proportional_data(num_rows, df):
+    # Gather statistics from the existing dataset
+    vehicle_type_probs = df['vehicle_type'].value_counts(normalize=True).to_dict()
+    transmission_probs = df['transmission'].value_counts(normalize=True).to_dict()
+    fuel_type_probs = df['fuel_type'].value_counts(normalize=True).to_dict()
+    brand_probs = df['brand'].value_counts(normalize=True).to_dict()
 
-# Stack for user actions
-if 'actions_stack' not in st.session_state:
-    st.session_state['actions_stack'] = []
+    price_mean, price_std = df['price_EUR'].mean(), df['price_EUR'].std()
+    odometer_mean, odometer_std = df['odometer_km'].mean(), df['odometer_km'].std()
+    registration_year_min, registration_year_max = df['registration_year'].min(), df['registration_year'].max()
+    power_ps_min, power_ps_max = df['power_ps'].min(), df['power_ps'].max()
 
-# Outliers Section
-with st.expander("Outliers Removal", expanded=False):
-    st.markdown("""
-    ### What is Outlier Removal?
-    Outliers are data points that differ significantly from other observations in the dataset.
-    Removing or handling outliers can:
-    - Enhance visualization and interpretation of data.
-    - Improve the accuracy of machine learning models.
-    - Prevent bias in statistical analyses.
+    data = []
+    for _ in range(num_rows):
+        row = {
+            "price_EUR": max(500, int(random.gauss(price_mean, price_std))),
+            "vehicle_type": random.choices(list(vehicle_type_probs.keys()), weights=vehicle_type_probs.values(), k=1)[
+                0],
+            "registration_year": random.randint(registration_year_min, registration_year_max),
+            "transmission": random.choices(list(transmission_probs.keys()), weights=transmission_probs.values(), k=1)[
+                0],
+            "power_ps": random.randint(power_ps_min, power_ps_max),
+            "model": fake.random_element(df['model'].unique()),
+            "odometer_km": max(0, int(random.gauss(odometer_mean, odometer_std))),
+            "fuel_type": random.choices(list(fuel_type_probs.keys()), weights=fuel_type_probs.values(), k=1)[0],
+            "brand": random.choices(list(brand_probs.keys()), weights=brand_probs.values(), k=1)[0],
+            "unrepaired_damage": fake.random_element(["ja", "nein", "Unknown"]),
+            "postal_code": random.randint(10000, 99999),
+        }
+        data.append(row)
+    return pd.DataFrame(data)
 
-    Use this section to define and apply outlier removal actions.
-    """)
 
-    # Columns to choose from
+# Streamlit Interface
+st.title("Synthetic Data Generator for Cars")
+st.sidebar.header("Generation Settings")
 
-    # User input for outlier removal
-    with st.container():
-        st.markdown("#### Create New Outlier Removal Action")
-        st.write("Define the parameters for outlier removal and apply the action.")
-        column = st.selectbox("Select column", NUMERICAL_COLUMNS, key="outlier_column")
-        method = st.selectbox("Select method", ["top", "bottom", "both"], key="outlier_method")
-        threshold = st.slider("Threshold (in %)", min_value=0.5, max_value=25.0, value=5.0, step=0.25,
-                              key="outlier_threshold")
+if "p4_method_selection" not in st.session_state:
+    st.session_state["p4_method_selection"] = "Random"
 
-        if st.button("Apply Action", key="apply_outlier_action"):
-            action = {
-                "column": column,
-                "method": method,
-                "threshold": threshold
-            }
-            st.session_state['actions_stack'].append(action)
-            df = remove_outliers(df, column, method, threshold)
-            st.session_state.df = df
+# Select generation method
+st.sidebar.selectbox("Data Generation Method",
+                     ["Random", "Faker", "Proportional", "No Generation"],
+                     key="p4_method_selection",
+                     index=["Random", "Faker", "Proportional", "No Generation"].index(
+                         st.session_state["p4_method_selection"])
+                     )
 
-# Label Encoding Section
-with st.expander("Label Encoding", expanded=False):
-    st.markdown("""
-    ### What is Label Encoding?
-    Label Encoding is the process of converting categorical variables into numerical values. 
-    It is useful for preparing data for machine learning models that require numerical inputs.
+method = st.session_state["p4_method_selection"]
 
-    Use this section to select categorical columns and apply label encoding.
-    """)
+if "p4_number_of_new_rows" not in st.session_state:
+    st.session_state["p4_number_of_new_rows"] = 100,
 
-    # User input for label encoding
-    with st.container():
-        st.markdown("#### Create New Label Encoding Action")
-        st.write("Select a categorical column to apply label encoding.")
-        column = st.selectbox("Select column", CATEGORICAL_COLUMNS, key="label_encoding_column")
+# Select the number of rows
+st.sidebar.slider("Number of Rows",
+                  min_value=10,
+                  max_value=1000,
+                  step=10,
+                  key="p4_number_of_new_rows",
+                  )
 
-        if st.button("Apply Label Encoding", key="apply_label_encoding_action"):
-            encoded_mapping = dict(enumerate(df[column].astype('category').cat.categories))
-            df[column] = df[column].astype('category').cat.codes
-            action = {
-                "column": column,
-                "action": "label_encoding",
-                "mapping": encoded_mapping
-            }
-            st.session_state['actions_stack'].append(action)
-            st.session_state.df = df
+num_rows = st.session_state["p4_number_of_new_rows"]
 
-# Scaling Section
-with st.expander("Scaling", expanded=False):
-    st.markdown("""
-    ### What is Scaling?
-    Scaling is the process of normalizing or standardizing numerical features.
-    It ensures that all features contribute equally to the model and avoids bias caused by differing feature magnitudes.
+# # Additional settings for Random and Proportional
+# if "p4_odometer_range" not in st.session_state:
+#     st.session_state["p4_odometer_range"] = (50000, 200000)
 
-    Use this section to apply scaling techniques to your dataset.
-    """)
 
-    # Column to choose from
+odometer_range = st.sidebar.slider("Odometer Range (km)",
+                                   min_value=0,
+                                   max_value=300000,
+                                   value=(50000, 200000),
+                                   step=1000,
+                                   key="p4_odometer_range"
+                                   )
 
-    with st.container():
-        st.markdown("#### Create New Scaling Action")
-        st.write("Select a column to apply scaling.")
-        column = st.selectbox("Select column", NUMERICAL_COLUMNS, key="scaling_column")
-        scaling_method = st.selectbox("Select scaling method", ["Min-Max Scaling", "Standard Scaling"],
-                                      key="scaling_method")
+if "p4_price_range" not in st.session_state:
+    st.session_state["p4_price_range"] = (1000, 20000)
 
-        if st.button("Apply Scaling", key="apply_scaling_action"):
-            if scaling_method == "Min-Max Scaling":
-                df[column] = (df[column] - df[column].min()) / (df[column].max() - df[column].min())
-            elif scaling_method == "Standard Scaling":
-                df[column] = (df[column] - df[column].mean()) / df[column].std()
+price_range = st.sidebar.slider("Price Range (€)",
+                                min_value=500,
+                                max_value=50000,
+                                value=st.session_state["p4_price_range"],
+                                step=500)
 
-            action = {
-                "column": column,
-                "action": "scaling",
-                "scaling_method": scaling_method
-            }
-            st.session_state['actions_stack'].append(action)
-            st.session_state.df = df
-
-# Removing Unnecessary Columns Section
-with st.expander("Removing Unnecessary Columns", expanded=False):
-    st.markdown("""
-    ### What is Removing Unnecessary Columns?
-    This step helps clean your dataset by dropping irrelevant columns or filtering rows based on specific categories.
-    This reduces noise and improves the performance of your model.
-
-    Use this section to define and remove unnecessary columns or rows.
-    """)
-
-    with st.container():
-        st.markdown("#### Create New Column Removal Action")
-        st.write("Select columns to remove or filter.")
-        column_to_remove = st.selectbox("Select columns to remove", df.columns.tolist(), key="columns_to_remove")
-
-        if st.button("Apply Column Removal", key="apply_column_removal_action"):
-            df = df.drop(columns=[column_to_remove])
-            action = {
-                "column_removed": column_to_remove,
-                "action": "column_removal"
-            }
-            st.session_state['actions_stack'].append(action)
-            st.session_state.df = df
-
-# Show action stack
-st.sidebar.markdown("### Action Stack")
-if st.session_state['actions_stack']:
-    for i, action in enumerate(st.session_state['actions_stack']):
-        if action.get("action") == "label_encoding":
-            with st.sidebar.expander(f"**Action {i + 1}:** Apply label encoding to column `{action['column']}`"):
-                st.write(action['mapping'])
-        elif action.get("action") == "scaling":
-            with st.sidebar.container(border=True):
-                st.write(f"**Action {i + 1}:** Applied {action['scaling_method']} to column `{action['column']}`")
-
-        elif action.get("action") == "column_removal":
-            with st.sidebar.container(border=True):
-                st.write(f"**Action {i + 1}:** Removed column: `{action['column_removed']}`")
+# Button to generate data
+if st.sidebar.button("Generate Data"):
+    if method == "Random":
+        generated_data = generate_random_data(num_rows, odometer_range, price_range)
+    elif method == "Faker":
+        generated_data = generate_faker_data(num_rows)
+    elif method == "Proportional":
+        if not st.session_state.df2.empty:
+            generated_data = generate_proportional_data(num_rows, st.session_state.df2)
         else:
-            with st.sidebar.container(border=True):
-                st.write(
-                    f"**Action {i + 1}:** Remove {action['method']} {action['threshold']}% outliers from column `{action['column']}`"
-                )
-else:
-    st.sidebar.write("No actions defined yet.")
+            st.error("Proportional generation requires existing data.")
+            generated_data = pd.DataFrame()
+    elif method == "No Generation":
+        generated_data = pd.DataFrame()
+        st.info("Generation is disabled.")
+    else:
+        generated_data = pd.DataFrame()
+
+    st.session_state.df2 = pd.concat([st.session_state.df2, generated_data], ignore_index=True)
+    st.success("Synthetic data successfully added!")
+
+# Display data
+st.subheader("Existing Data")
+st.dataframe(st.session_state.df2)
+
+# Option to download data
+if not st.session_state.df2.empty:
+    csv = st.session_state.df2.to_csv(index=False).encode('utf-8')
+    st.download_button("Download Data as CSV", data=csv, file_name="synthetic_data.csv", mime="text/csv")

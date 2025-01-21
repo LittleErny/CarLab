@@ -32,3 +32,5 @@ class DashboardItem(ABC):
             },
             default=str,  # Handle non-serializable types
         )
+
+

@@ -14,8 +14,9 @@ from helpers import NUMERICAL_COLUMNS, CATEGORICAL_COLUMNS
 # Some constants
 LIST_GRAPHS_1_VAR = [ChartTypes.BOXPLOT, ChartTypes.HISTOGRAM, ChartTypes.KDE]
 LIST_GRAPHS_2_VAR = [ChartTypes.SCATTER, ChartTypes.LINE, ChartTypes.BAR, ChartTypes.CATEGORICAL_BOXPLOTS]
-LIST_GRAPHS_3_OR_MORE_VAR = [ChartTypes.CORRELATION_HEATMAP, ChartTypes.PAIRPLOT, ChartTypes.THREE_D_SCATTER,
-                             # "Parallel Coordinates", "Pivot Table Heatmap",
+LIST_GRAPHS_3_OR_MORE_VAR = [ChartTypes.CORRELATION_HEATMAP,
+                             # ChartTypes.PAIRPLOT, ChartTypes.THREE_D_SCATTER,  # NOT IMPLEMENTED YET
+                             # "Parallel Coordinates", "Pivot Table Heatmap",    # DO NOT UNCOMMENT
                              # "Missing Data Heatmap"
                              ]
 
@@ -157,9 +158,9 @@ class ChartItem(DashboardItem):
                              on_change=self.on_change_function,
                              args=(pos_id, "chart_type", f"chart_type_{pos_id}")
                              )
-
+                # print("!!!!!!", self.chart_type)
                 # Then choose X-axis parameter
-                if self.chart_type is ChartTypes.HISTOGRAM:
+                if self.chart_type == ChartTypes.HISTOGRAM:
                     # For Histogram any parameter can be used
                     render_axis_selectbox("x", df.columns, list(df.columns).index(self.x))
 

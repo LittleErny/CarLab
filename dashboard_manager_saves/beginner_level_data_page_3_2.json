@@ -1,0 +1,50 @@
+{
+    "0": {
+        "type": "MD_BOX",
+        "content": "In this section you will see the visualisation of the data after all the preprocessing actions were applied.\n\nFirst, let's have a look at how the Label Encoding worked. Remember that you can check every categorical parameter by yourself, just edit the graph in the expander below😉 ",
+        "manager_page_number": "3",
+        "mode": "MdBoxModes.VIEW"
+    },
+    "1": {
+        "type": "CHART",
+        "title": "Example of Label Encoding",
+        "chart_type": "ChartTypes.HISTOGRAM",
+        "amount_of_params": 1,
+        "x": "vehicle_type",
+        "y": "price_EUR",
+        "z": "price_EUR",
+        "high_res_mode": false
+    },
+    "2": {
+        "type": "MD_BOX",
+        "content": "Then let's check the distribution of some numerical parameters after removing top 1% of their rows: ",
+        "manager_page_number": "3",
+        "mode": "MdBoxModes.VIEW"
+    },
+    "3": {
+        "type": "CHART",
+        "title": "Distribution of price_EUR after Outlier Removal",
+        "chart_type": "ChartTypes.BOXPLOT",
+        "amount_of_params": 1,
+        "x": "price_EUR",
+        "y": "price_EUR",
+        "z": "price_EUR",
+        "high_res_mode": false
+    },
+    "4": {
+        "type": "CHART",
+        "title": "Distribution of price_EUR after Outlier Removal",
+        "chart_type": "ChartTypes.BOXPLOT",
+        "amount_of_params": 1,
+        "x": "power_ps",
+        "y": "price_EUR",
+        "z": "price_EUR",
+        "high_res_mode": false
+    },
+    "5": {
+        "type": "MD_BOX",
+        "content": "Now don't forget to apply scaling, if you haven't!\n\n(however if you want to include some fake data,  return here after you visit the Faker page)",
+        "manager_page_number": "3",
+        "mode": "MdBoxModes.VIEW"
+    }
+}

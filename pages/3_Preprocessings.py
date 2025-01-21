@@ -1,6 +1,4 @@
 import os
-import weakref
-
 import streamlit as st
 
 from DashboardManager.ChartItem import ChartItem
@@ -8,14 +6,14 @@ from DashboardManager.DashboardItem import DashboardItem
 from DashboardManager.DashboardManagerEnums import ChartTypes, DashboardItemTypes, PreprocessingTypes
 from DashboardManager.MDBoxItem import MDBoxItem
 from DashboardManager.DashboardManager import DashboardManager
-from helpers import initialize_global_session_variables_if_not_yet, NUMERICAL_COLUMNS
+from helpers import initialize_global_session_variables_if_not_yet, NUMERICAL_COLUMNS, execute_preprocessing_action
 
 PAGE_NUMBER = os.path.basename(__file__).split("_")[0]  # The number in front of the filename
 PREPROCESSING_OPTIONS = [PreprocessingTypes.OUTLIER_REMOVAL, PreprocessingTypes.LABEL_ENCODING,
                          PreprocessingTypes.SCALING, PreprocessingTypes.REMOVING_UNNEC_COLUMN]
 
+st.set_page_config(page_title="CarLab Preprocessing", page_icon="✏️")
 
-# TODO: fix the problem with re-rendering heavy charts if they are not edited or created in the first time
 
 # Functions to handle changes for each input element
 def update_item_state(item_id: int, what_to_update: str, changed_field_key: str) -> None:
@@ -51,25 +49,24 @@ def create_some_item(item_type: DashboardItemTypes, manager: DashboardManager, i
 
 
 def render_sidebar_preprocessing_config_bar():
-    def remove_outliers(column, method, threshold):
-
-        global df
-        if method == 'top':
-            # print("remove_outliers1", id(df), len(df), threshold)
-            df.drop(df[df[column] > df[column].quantile(1 - threshold / 100)].index, inplace=True)
-            # print("remove_outliers2", id(df), len(df))
-        elif method == 'bottom':
-            df.drop(df[df[column] < df[column].quantile(threshold / 100)].index, inplace=True)
-        elif method == 'both':
-            lower_bound = df[column].quantile(threshold / 100)
-            upper_bound = df[column].quantile(1 - threshold / 100)
-            # Удаление значений вне диапазона (нижний и верхний порог)
-            df.drop(df[(df[column] < lower_bound) | (df[column] > upper_bound)].index, inplace=True)
-        else:
-            raise ValueError()
-
     global df
-    # print("render_sidebar_preprocessing_config_bar:", id(df))
+
+    # Uncomment this to be able to edit saved manager states
+    if st.sidebar.button("Save current page state"):
+        preproc_manager.save_to_json("dashboard_manager_saves/beginner_level_data_page_3_1.json")
+        manager.save_to_json("dashboard_manager_saves/beginner_level_data_page_3_2.json")
+
+    if st.sidebar.button("Load page from json"):
+        preproc_manager.load_from_json(update_item_state,
+                                       df,
+                                       "dashboard_manager_saves/beginner_level_data_page_3_1.json",
+                                       skip_rerun=True  # as we need to load one more manager
+                                       )
+        manager.load_from_json(update_item_state,
+                               df,
+                               "dashboard_manager_saves/beginner_level_data_page_3_2.json")
+
+    st.sidebar.write("- - -")
 
     st.sidebar.selectbox(
         "Please select the type of Preprocessing action:", PREPROCESSING_OPTIONS,
@@ -89,24 +86,19 @@ def render_sidebar_preprocessing_config_bar():
         st.sidebar.slider("Threshold (in %)", min_value=0.25, max_value=25.0, value=5.0, step=0.25,
                           key="p3_outlier_threshold")
         selected_threshold = st.session_state["p3_outlier_threshold"]
+
         st.sidebar.write(
             f"So, {int(len(df) * float(selected_threshold) * 0.01)} of {selected_method} lines will be removed")
 
-        # Apply button
         if st.sidebar.button("Apply", key="apply_preproc_action"):
-            action = {
-                "column": selected_column,
-                "method": selected_method,
-                "threshold": selected_threshold
-            }
-            preproc_manager.create_item(item_pos=len(preproc_manager.items),
-                                        item_type=DashboardItemTypes.PREPROCESSING_BOX,
-                                        action=action,
-                                        preproc_type=PreprocessingTypes.OUTLIER_REMOVAL)
-            # print("calling remove_outliers", len(df))
-            remove_outliers(selected_column, selected_method, selected_threshold)
-            # print("remove_outliers was called", len(df))
-            # st.session_state.df2  # Update the editable version of df
+            execute_preprocessing_action(
+                action_type=PreprocessingTypes.OUTLIER_REMOVAL,
+                df=df,
+                manager=preproc_manager,
+                column=selected_column,
+                method=selected_method,
+                threshold=selected_threshold
+            )
 
     elif selected_type == PreprocessingTypes.LABEL_ENCODING:
         st.sidebar.selectbox("Select column to encode", st.session_state.categorical_columns,
@@ -114,18 +106,12 @@ def render_sidebar_preprocessing_config_bar():
         selected_column = st.session_state["p3_preprocessing_column"]
 
         if st.sidebar.button("Apply", key="apply_preproc_action"):
-            encoded_mapping = dict(enumerate(df[selected_column].astype('category').cat.categories))
-            st.session_state.df2[selected_column] = st.session_state.df2[selected_column].astype('category').cat.codes
-            # df[selected_column] = df[selected_column].astype('category').cat.codes
-            action = {
-                "column": selected_column,
-                "action": "label_encoding",
-                "mapping": encoded_mapping
-            }
-            preproc_manager.create_item(item_pos=len(preproc_manager.items),  # add on the end of the list
-                                        item_type=DashboardItemTypes.PREPROCESSING_BOX,
-                                        action=action,
-                                        preproc_type=PreprocessingTypes.LABEL_ENCODING)
+            execute_preprocessing_action(
+                action_type=PreprocessingTypes.LABEL_ENCODING,
+                manager=preproc_manager,
+                df=df,
+                column=selected_column
+            )
 
     elif selected_type == PreprocessingTypes.SCALING:
         st.sidebar.selectbox("Select column", NUMERICAL_COLUMNS, key="p3_preprocessing_column")
@@ -133,29 +119,16 @@ def render_sidebar_preprocessing_config_bar():
 
         st.sidebar.selectbox("Select scaling method", ["Min-Max Scaling", "Standard Scaling"],
                              key="p3_scaling_method")
-
-        scaling_method = st.session_state["p3_scaling_method"]
+        selected_scaling_method = st.session_state["p3_scaling_method"]
 
         if st.sidebar.button("Apply", key="apply_preproc_action"):
-            if scaling_method == "Min-Max Scaling":
-                df[selected_column] = ((df[selected_column] - df[selected_column].min()) /
-                                       (df[selected_column].max() - df[selected_column].min()))
-            elif scaling_method == "Standard Scaling":
-                df[selected_column] = (df[selected_column] - df[selected_column].mean()) / df[selected_column].std()
-
-            else:
-                raise ValueError(f"Unknown scaling_method while applying scaling: got: {scaling_method}")
-
-            action = {
-                "column": selected_column,
-                "action": "scaling",
-                "scaling_method": scaling_method
-            }
-
-            preproc_manager.create_item(item_pos=len(preproc_manager.items),  # add on the end of the list
-                                        item_type=DashboardItemTypes.PREPROCESSING_BOX,
-                                        action=action,
-                                        preproc_type=PreprocessingTypes.SCALING)
+            execute_preprocessing_action(
+                action_type=PreprocessingTypes.SCALING,
+                manager=preproc_manager,
+                df=df,
+                column=selected_column,
+                scaling_method=selected_scaling_method
+            )
 
     elif selected_type == PreprocessingTypes.REMOVING_UNNEC_COLUMN:
         pass
@@ -181,13 +154,50 @@ render_sidebar_preprocessing_config_bar()
 
 # print("Main:", weakref.ref(st.session_state.df2), len(st.session_state.df2))
 # If we do not have any items to show, let the user create the first one
+st.write("# Preprocessing Tool")
+
+with st.expander("Brief Instructions", expanded=False):
+    st.markdown("""
+### How works this page?
+
+This page is very similar to the previous one, however has some differences. The page is split into the 2 parts - 
+Executing preprocessing actions, and Visualizing the result of preprocessing actions. So, it means that you first should
+execute all the preprocessing actions, and only then try to visualize them. 
+
+Note: Here and further the copy of initial dataset is used. You will not see any changes in Parameters Visualisation 
+page. 
+
+Note: The same dataset is used on this and Faker page. So, for example, if you create 1000 fake rows on the Faker page,
+it will have impact on the graphs on this page also. So I recommend applying Scaling only after you create additional 
+Fake Data and study it sufficiently.
+
+Note: In current version there is no way to discard particular preprocessing action or mix their order 
+after they were executed. So please make sure to do it in the correct order.
+""")
+
+with st.expander("Brief theory", expanded=False):
+    st.markdown("""### Data Preprocessing Overview
+
+#### Outliers Removal
+Outliers are data points that differ significantly from other observations in the dataset. Removing or handling outliers can:
+
+- Enhance visualization and interpretation of data.
+- Improve the accuracy of machine learning models.
+- Prevent bias in statistical analyses.
+
+#### Label Encoding
+Label Encoding is the process of converting categorical variables into numerical values. It is useful for preparing data for machine learning models that require numerical inputs.
+
+#### Scaling
+Scaling is the process of normalizing or standardizing numerical features. It ensures that all features contribute equally to the model and avoids bias caused by differing feature magnitudes.
+""")
+
 st.write("## Preprocessing History")
-st.write("Here you can see all the preprocessing actions that were executed.")
-st.write("In order to initiate a new preprocessing action, have a look at the sidebar from the left.")
 
 # Generate the upper part of the page
 if preproc_manager.is_empty():
     st.write("*No preprocessing actions to show.*")
+    st.write("*In order to initiate a new preprocessing action, have a look at the sidebar from the left.*")
     st.button(
         "➕ **Add New Text Below**",
         key=f"add_preproc_md_text_below_{0}",
@@ -270,6 +280,7 @@ else:
 # Divide the page on 2 parts - the upper is for preprocessing logging, the lower for graphs
 # However, MDBoxes are accepted in both parts
 st.write("- - -")
+st.write("## Post-Preprocessing Data Visualisation")
 
 # If we do not have any items to show, let the user create the first one
 if manager.is_empty():

@@ -32,7 +32,7 @@ class PreprocessingItem(DashboardItem):
             column, scaling_method = self.action["column"], self.action["scaling_method"]
 
             st.write("#### Numerical Parameter Scaling")
-            st.write(f"The ``{column}`` was scaled using {scaling_method} method.")
+            st.write(f"The ``{column}`` was scaled using ``{scaling_method}`` method.")
 
         elif self.preprocessing_type == PreprocessingTypes.REMOVING_UNNEC_COLUMN:
             st.write("Some column was removed")

@@ -8,8 +8,12 @@ import json
 from DashboardManager.DashboardItem import DashboardItem
 from DashboardManager.ChartItem import ChartItem
 from DashboardManager.MDBoxItem import MDBoxItem
-from DashboardManager.DashboardManagerEnums import DashboardItemTypes
+from DashboardManager.DashboardManagerEnums import DashboardItemTypes, PreprocessingTypes
+from DashboardManager.Model.ModelSelectionItem import ModelSelectionItem
+from DashboardManager.Model.ModelSettingItem import ModelSettingItem
+from DashboardManager.Model.ModelTrainingItem import ModelTrainingItem
 from DashboardManager.PreprocessingItem import PreprocessingItem
+from helpers import execute_preprocessing_action
 
 
 class DashboardManager:
@@ -51,7 +55,7 @@ class DashboardManager:
         new_item: DashboardItem
 
         if item_type == DashboardItemTypes.CHART:
-            print("Manager:", weakref.ref(kwargs["df"]))
+            # print("Manager:", weakref.ref(kwargs["df"]))
 
             new_item = ChartItem(id=self.amount_of_items, *args, **kwargs)
             # self.items[self.amount_of_items] = new_chart_item
@@ -63,7 +67,20 @@ class DashboardManager:
 
         elif item_type == DashboardItemTypes.PREPROCESSING_BOX:
 
+            # aaa
             new_item = PreprocessingItem(**kwargs)
+
+        elif item_type == DashboardItemTypes.MODEL_SELECTION:
+
+            new_item = ModelSelectionItem(**kwargs)
+
+        elif item_type == DashboardItemTypes.MODEL_SETTING:
+
+            new_item = ModelSettingItem(**kwargs)
+
+        elif item_type == DashboardItemTypes.MODEL_TRAINING:
+
+            new_item = ModelTrainingItem(**kwargs)
 
         else:
             raise ValueError(f"Unknown item type: {item_type}")
@@ -119,23 +136,29 @@ class DashboardManager:
         items_data = {
             item_id: json.loads(str(item)) for item_id, item in self.items.items()
         }
+
+        for i in items_data.values():
+            if "df_ref" in i:
+                del i["df_ref"]
+
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(items_data, f, indent=4, ensure_ascii=False)
 
-    def load_from_json(self, on_change_function, df, filepath: str):
+    def load_from_json(self, on_change_function, df, filepath: str, skip_rerun=False):
         """
         Loads the state of the DashboardManager from a JSON file.
 
         :param filepath: Path to the JSON file.
         """
-
+        print("Trying to load_from_json: ", filepath)
         with open(filepath, "r", encoding="utf-8") as f:
             items_data = json.load(f)
 
         self.items.clear()
-
+        print(len(items_data.items()))
         for item_id, item_data in items_data.items():
             item_type = DashboardItemTypes[item_data["type"]]  # Extract the item type
+            # print(f"While extracting from {filepath} the {item_type} was found.")
             del item_data["type"]  # Remove type from the data as it's used for initialization
             if item_type == DashboardItemTypes.CHART:
                 new_item = ChartItem(id=int(item_id), on_change_function=on_change_function, df=df)
@@ -145,11 +168,27 @@ class DashboardManager:
                 new_item = MDBoxItem(manager_page_number=self.page_number, on_change_function=on_change_function)
                 for key, value in item_data.items():
                     new_item[key] = value
+            elif item_type == DashboardItemTypes.PREPROCESSING_BOX:
+                preproc_type = item_data["preprocessing_type"]
+                action = item_data["action"]
+                new_item = PreprocessingItem(action=action, preproc_type=preproc_type)
+                execute_preprocessing_action(
+                    action_type=preproc_type,
+                    manager=self,
+                    df=df,
+                    column=action["column"] if "column" in action else None,
+                    method=action["method"] if "method" in action else None,
+                    scaling_method=action["scaling_method"] if "scaling_method" in action else None,
+                    mapping=action["mapping"] if "mapping" in action else None,
+                    threshold=action["threshold"] if "threshold" in action else None
+                )
             else:
                 raise ValueError(f"Unsupported item type: {item_type}")
             self.items[int(item_id)] = new_item
 
-        st.rerun()
+        # Sometimes we need to skip this in order to load one more manager afterwards
+        if not skip_rerun:
+            st.rerun()
 
     def __str__(self):
         """
