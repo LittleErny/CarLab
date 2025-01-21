@@ -1,0 +1,22 @@
+version: "3.1"
+
+rules:
+- rule: Greet and ask for details
+  steps:
+  - intent: greet
+  - action: utter_greet
+
+- rule: Provide car recommendation after budget
+  steps:
+  - intent: provide_budget
+  - action: action_provide_car_recommendation
+
+- rule: Thank the bot
+  steps:
+  - intent: thank_you
+  - action: utter_thank_you
+
+- rule: Say goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye

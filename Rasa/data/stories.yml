@@ -1,0 +1,33 @@
+version: "3.1"
+
+stories:
+- story: User greets and provides details
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: provide_details
+  - action: utter_ask_budget
+
+- story: User provides budget
+  steps:
+  - intent: provide_budget
+  - action: action_provide_car_recommendation
+
+- story: User requests car advice directly
+  steps:
+  - intent: request_car_advice
+  - action: utter_ask_details
+  - intent: provide_details
+  - action: utter_ask_budget
+  - intent: provide_budget
+  - action: action_provide_car_recommendation
+
+- story: User says thank you
+  steps:
+  - intent: thank_you
+  - action: utter_thank_you
+
+- story: User says goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye

@@ -1,0 +1,94 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - provide_details
+  - provide_budget
+  - request_car_advice
+  - inquire_about_features
+  - thank_you
+
+entities:
+  - age
+  - income
+  - family_size
+  - budget
+  - car_type
+  - fuel_type
+  - requirements
+  - features
+  - car_use_case
+
+slots:
+  age:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_text
+  income:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_text
+  family_size:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_text
+  budget:
+    type: float
+    influence_conversation: true
+    mappings:
+      - type: from_text
+  car_type:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_text
+  fuel_type:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_text
+  requirements:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_text
+  features:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_text
+  car_use_case:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_text
+
+responses:
+  utter_greet:
+    - text: "Hello! I can help you find the perfect car. Could you share some details like your budget or requirements?"
+    - text: "Hi there! Ready to explore car options?"
+
+  utter_goodbye:
+    - text: "Goodbye! Feel free to reach out anytime."
+    - text: "Take care and let me know if you need more help!"
+
+  utter_ask_details:
+    - text: "Could you provide your age, family size, and income to get started?"
+
+  utter_ask_budget:
+    - text: "What is your budget for the car?"
+
+  utter_provide_car_advice:
+    - text: "Here are some cars that match your needs. Let me find them for you!"
+
+  utter_thank_you:
+    - text: "You're welcome! Let me know if there's anything else I can assist with."
+
+actions:
+  - action_provide_car_recommendation

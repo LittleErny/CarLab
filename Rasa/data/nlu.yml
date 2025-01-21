@@ -1,0 +1,62 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - hi
+    - hello
+    - hey
+    - good morning
+    - good evening
+
+- intent: goodbye
+  examples: |
+    - bye
+    - goodbye
+    - see you later
+    - take care
+
+- intent: affirm
+  examples: |
+    - yes
+    - indeed
+    - correct
+    - absolutely
+
+- intent: deny
+  examples: |
+    - no
+    - not really
+    - I don't think so
+
+- intent: provide_details
+  examples: |
+    - I am 30 years old with a family of 4.
+    - My income is 3000 euros per month.
+    - I have a family of 2 and earn 4500 monthly.
+    - I'm 25, single, and looking for a car for work.
+
+- intent: provide_budget
+  examples: |
+    - My budget is 15000 euros.
+    - I can spend up to 20000.
+    - I'm looking for cars under 5000 euros.
+
+- intent: request_car_advice
+  examples: |
+    - Can you suggest a car for me?
+    - What car would you recommend?
+    - Please help me choose a car.
+
+- intent: inquire_about_features
+  examples: |
+    - I need a car with good mileage.
+    - It should be an electric car.
+    - I want something family-friendly with 7 seats.
+
+- intent: thank_you
+  examples: |
+    - Thanks
+    - Thank you
+    - Appreciate it
+    - Much obliged
