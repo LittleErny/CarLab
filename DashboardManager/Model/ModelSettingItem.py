@@ -1,10 +1,9 @@
 import streamlit as st
 
 from DashboardManager.DashboardItem import DashboardItem
-from DashboardManager.DashboardManagerEnums import DashboardItemTypes, MLModelTypes
+from DashboardManager.DashboardManagerEnums import DashboardItemTypes
 from DashboardManager.Model.Model import MLModel
-from DashboardManager.Model.ModelRelatedEnums import LossFunctions, NeuralNetworkActivations, NeuralNetworkOptimizers, \
-    NeuralNetworkLossFunctions
+from DashboardManager.Model.ModelRelatedEnums import LossFunctions, MLModelTypes
 
 LIST_OF_MODEL_TYPES = [MLModelTypes.LINEAR_REGRESSION, MLModelTypes.RIDGE_REGRESSION, MLModelTypes.LASSO_REGRESSION,
                        MLModelTypes.DECISION_TREE, MLModelTypes.RANDOM_FOREST, MLModelTypes.XGBOOST,
@@ -90,7 +89,7 @@ class ModelSettingItem(DashboardItem):
             st.selectbox(
                 "Max Features",
                 ["auto", "sqrt", "log2"],
-                index=["auto", "sqrt", "log2"].index(self.ml_model.max_features),
+                index=["sqrt", "log2"].index(self.ml_model.max_features),
                 key="input_max_features",
                 help="The number of features to consider when looking for the best split.",
                 on_change=self.on_change_function,
@@ -137,54 +136,6 @@ class ModelSettingItem(DashboardItem):
                 help="Specifies whether to train on CPU or GPU.",
                 on_change=self.on_change_function,
                 kwargs={"what_to_update": "task_type", "changed_field_key": "input_task_type"}
-            )
-
-        elif self.ml_model.model_type == MLModelTypes.NEURAL_NETWORK:
-            st.text_input(
-                "Hidden Layers (comma-separated)",
-                value=",".join(map(str, self.ml_model.hidden_layers)),
-                key="input_hidden_layers",
-                help="Defines the number and size of hidden layers in the neural network. Example: 64,32.",
-                on_change=self.on_change_function,
-                kwargs={"what_to_update": "hidden_layers", "changed_field_key": "input_hidden_layers"}
-            )
-            st.selectbox(
-                "Activation Function",
-                list(NeuralNetworkActivations),
-                format_func=lambda x: x.value,
-                index=list(NeuralNetworkActivations).index(self.ml_model.activation),
-                key="input_activation",
-                help="The activation function applied to each layer's output.",
-                on_change=self.on_change_function,
-                kwargs={"what_to_update": "activation", "changed_field_key": "input_activation"}
-            )
-            st.selectbox(
-                "Optimizer",
-                list(NeuralNetworkOptimizers),
-                format_func=lambda x: x.value,
-                index=list(NeuralNetworkOptimizers).index(self.ml_model.optimizer),
-                key="input_optimizer",
-                help="The optimization algorithm used to minimize the loss function.",
-                on_change=self.on_change_function,
-                kwargs={"what_to_update": "optimizer", "changed_field_key": "input_optimizer"}
-            )
-            st.number_input(
-                "Number of Epochs",
-                value=self.ml_model.epochs,
-                min_value=1,
-                key="input_epochs",
-                help="The number of complete passes through the training dataset.",
-                on_change=self.on_change_function,
-                kwargs={"what_to_update": "epochs", "changed_field_key": "input_epochs"}
-            )
-            st.number_input(
-                "Batch Size",
-                value=self.ml_model.batch_size,
-                min_value=1,
-                key="input_batch_size",
-                help="The number of samples processed before updating the model.",
-                on_change=self.on_change_function,
-                kwargs={"what_to_update": "batch_size", "changed_field_key": "input_batch_size"}
             )
 
         else:

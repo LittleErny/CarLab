@@ -46,7 +46,6 @@ class ChartItem(DashboardItem):
         self.y = df.columns[0]  # Initialize y and z in advance, even if they are not used
         self.z = df.columns[0]
         self.df_ref = weakref.ref(df)
-        # print("ChartItem", self.df_ref)
         self.high_res_mode = False
 
     def __repr__(self):
@@ -60,13 +59,13 @@ class ChartItem(DashboardItem):
 
     def _calculate_hash(self):
         """
-        Вычисляет хэш для текущих параметров графика, чтобы использовать его для кэширования.
+        Calculates a hash for the current graph parameters to use for caching.
         """
-        # Хэшируем данные из DataFrame, чтобы отследить изменения данных
+        # Hashing data from a DataFrame to track data changes
         df = self.df_ref()
         df_hash = hashlib.md5(pd.util.hash_pandas_object(df, index=True).values.tobytes()).hexdigest()
-        # print("df_hash:", self.df_ref, df_hash, len(df))
-        # Собираем параметры для хэширования
+
+        # Collecting parameters for hashing
         params = (
             df_hash,
             self.chart_type,
@@ -77,7 +76,7 @@ class ChartItem(DashboardItem):
             self.high_res_mode
         )
 
-        # Создаем хэш из параметров
+        # Create hash from the parameters
         return hashlib.md5(str(params).encode('utf-8')).hexdigest()
 
     def render(self, pos_id):  # We take new id for rendering and do not store it in __init__(), as it might be changed
@@ -158,7 +157,7 @@ class ChartItem(DashboardItem):
                              on_change=self.on_change_function,
                              args=(pos_id, "chart_type", f"chart_type_{pos_id}")
                              )
-                # print("!!!!!!", self.chart_type)
+
                 # Then choose X-axis parameter
                 if self.chart_type == ChartTypes.HISTOGRAM:
                     # For Histogram any parameter can be used
@@ -244,7 +243,7 @@ class ChartItem(DashboardItem):
     def get_graph_type(self):
         return self.chart_type
 
-    # @st.cache_data  TODO: make our own caching here for images in buffer
+    # @st.cache_data
     def render_chart(_self):  # _self is for not to be visible for the st caching function
         """
         Render a chart based on the chart type and parameters.
@@ -258,7 +257,6 @@ class ChartItem(DashboardItem):
         # If the hash is already in the cache, return the saved image and width
         current_hash = self._calculate_hash()
         if current_hash in st.session_state["chart_hashes"]:
-            # print("Kache used")
             return (st.session_state["chart_hashes"][current_hash]['buffer'],
                     st.session_state["chart_hashes"][current_hash]['width'])
 
@@ -270,7 +268,6 @@ class ChartItem(DashboardItem):
             width = 1000
 
         df = self.df_ref()
-        # print("render_chart", self.df_ref, len(df))
 
         if self.high_res_mode:
             # Make the names of categories vertical, so that user can read it when there are a lot of them
@@ -355,7 +352,6 @@ class ChartItem(DashboardItem):
 
             # check if the graph type can be chosen when we have only 1 graph param
             if not any(list(map(lambda x: x == self.chart_type, LIST_GRAPHS_1_VAR))):
-                # print("BOXPLOT WAS SET DURING VALIDATION")
                 self.chart_type = ChartTypes.BOXPLOT  # set to the basic one
 
             # then check the conflict btw chart_type and the type of parameter
@@ -370,7 +366,6 @@ class ChartItem(DashboardItem):
 
             # check if the graph type can be chosen when we have 2 graph params (axis)
             if not any(list(map(lambda x: x == self.chart_type, LIST_GRAPHS_2_VAR))):
-                # print("It was changed..")
                 self.chart_type = ChartTypes.SCATTER  # set to the basic one
 
             if self.chart_type == ChartTypes.CATEGORICAL_BOXPLOTS:

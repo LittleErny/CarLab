@@ -11,8 +11,6 @@ from helpers import initialize_global_session_variables_if_not_yet
 
 # Functions to handle changes for each input element
 def update_item_state(item_id: int, what_to_update: str, changed_field_key: str) -> None:
-    # print("error here:", item_id, what_to_update, changed_field_key, manager.items, st.session_state)
-    # print("Before update:", manager.items, st.session_state[changed_field_key])
 
     if what_to_update == "chart_type":
         manager.items[item_id][what_to_update] = ChartTypes.from_string(st.session_state[changed_field_key])
@@ -21,7 +19,6 @@ def update_item_state(item_id: int, what_to_update: str, changed_field_key: str)
 
 
 def create_some_item(item_type, item_pos, *args, **kwargs):
-    # print("create_some_item")
     manager.create_item(item_type, item_pos, *args, **kwargs)
 
 
@@ -104,7 +101,6 @@ if not st.session_state.hardcore_mode and not st.session_state.page_2_was_ever_r
 
 # If we do not have any items to show, let the user create the first one
 if manager.is_empty():
-    # print("Manager is empty", id(manager))
     col1, col2, _ = st.columns([1, 1, 2])
     col1.button(
         "➕ **Add First Chart**",

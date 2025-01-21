@@ -13,7 +13,12 @@ __pycache__*
 *.bak
 *.orig
 
-*.csv
 *.txt
 backups/
 catboost_info/
+
+# Rasa
+.rasa/
+Rasa/.rasa/
+tracker.db
+models/

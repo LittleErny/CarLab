@@ -17,9 +17,6 @@ st.set_page_config(page_title="CarLab Preprocessing", page_icon="✏️")
 
 # Functions to handle changes for each input element
 def update_item_state(item_id: int, what_to_update: str, changed_field_key: str) -> None:
-    # print("error here:", item_id, what_to_update, changed_field_key, manager.items, st.session_state)
-    # print("Before update:", manager.items, st.session_state[changed_field_key])
-
     if what_to_update == "chart_type":
         manager.items[item_id][what_to_update] = ChartTypes.from_string(st.session_state[changed_field_key])
     elif what_to_update == "preprocessing_type":
@@ -29,9 +26,6 @@ def update_item_state(item_id: int, what_to_update: str, changed_field_key: str)
 
 
 def update_item_state_in_preproc_manager(item_id: int, what_to_update: str, changed_field_key: str) -> None:
-    # print("error here:", item_id, what_to_update, changed_field_key, manager.items, st.session_state)
-    # print("Before update:", manager.items, st.session_state[changed_field_key])
-
     if what_to_update == "chart_type":
         preproc_manager.items[item_id][what_to_update] = ChartTypes.from_string(st.session_state[changed_field_key])
     elif what_to_update == "preprocessing_type":
@@ -42,9 +36,6 @@ def update_item_state_in_preproc_manager(item_id: int, what_to_update: str, chan
 
 
 def create_some_item(item_type: DashboardItemTypes, manager: DashboardManager, item_pos: int, *args, **kwargs):
-    # print("create_some_item")
-    # if "df" in kwargs:
-    #     print("create_some_item", weakref.ref(kwargs["df"]))
     manager.create_item(item_type, item_pos, *args, **kwargs)
 
 
@@ -152,7 +143,6 @@ manager = DashboardManager(PAGE_NUMBER)
 
 render_sidebar_preprocessing_config_bar()
 
-# print("Main:", weakref.ref(st.session_state.df2), len(st.session_state.df2))
 # If we do not have any items to show, let the user create the first one
 st.write("# Preprocessing Tool")
 
@@ -284,7 +274,6 @@ st.write("## Post-Preprocessing Data Visualisation")
 
 # If we do not have any items to show, let the user create the first one
 if manager.is_empty():
-    # print("Manager is empty", id(manager))
     col1, col2, _ = st.columns([1, 1, 2])
     col1.button(
         "➕ **Add First Chart**",

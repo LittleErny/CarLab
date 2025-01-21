@@ -55,15 +55,12 @@ class DashboardManager:
         new_item: DashboardItem
 
         if item_type == DashboardItemTypes.CHART:
-            # print("Manager:", weakref.ref(kwargs["df"]))
 
             new_item = ChartItem(id=self.amount_of_items, *args, **kwargs)
-            # self.items[self.amount_of_items] = new_chart_item
 
         elif item_type == DashboardItemTypes.MD_BOX:
 
             new_item = MDBoxItem(manager_page_number=self.page_number, **kwargs)
-            # self.items[self.amount_of_items] = new_mdbox_item
 
         elif item_type == DashboardItemTypes.PREPROCESSING_BOX:
 
@@ -150,15 +147,13 @@ class DashboardManager:
 
         :param filepath: Path to the JSON file.
         """
-        print("Trying to load_from_json: ", filepath)
+
         with open(filepath, "r", encoding="utf-8") as f:
             items_data = json.load(f)
 
         self.items.clear()
-        print(len(items_data.items()))
         for item_id, item_data in items_data.items():
             item_type = DashboardItemTypes[item_data["type"]]  # Extract the item type
-            # print(f"While extracting from {filepath} the {item_type} was found.")
             del item_data["type"]  # Remove type from the data as it's used for initialization
             if item_type == DashboardItemTypes.CHART:
                 new_item = ChartItem(id=int(item_id), on_change_function=on_change_function, df=df)

@@ -3,7 +3,8 @@ import requests
 import os
 import subprocess
 
-# TODO:
+from helpers import initialize_global_session_variables_if_not_yet
+
 # Fix title duplication on first user input.
 # Train the model for our dataset (currently working on the default one).
 # Create a system persona.
@@ -19,6 +20,11 @@ def start_server():
     os.chdir("Rasa")
     subprocess.Popen(['start', 'cmd', '/k', 'rasa run'], shell=True)
     os.chdir("..")  # Return to the root directory
+
+
+st.set_page_config(page_title="CarLab Chatbot", page_icon="💬")
+initialize_global_session_variables_if_not_yet()
+
 
 # Initialize the server
 start_server()

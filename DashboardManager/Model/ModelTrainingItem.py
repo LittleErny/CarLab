@@ -1,8 +1,9 @@
 import streamlit as st
 
 from DashboardManager.DashboardItem import DashboardItem
-from DashboardManager.DashboardManagerEnums import DashboardItemTypes, MLModelTypes
-from DashboardManager.Model.Model import MLModel
+from DashboardManager.DashboardManagerEnums import DashboardItemTypes
+
+from DashboardManager.Model.ModelRelatedEnums import MLModelTypes
 
 LIST_OF_MODEL_TYPES = [MLModelTypes.LINEAR_REGRESSION, MLModelTypes.RIDGE_REGRESSION, MLModelTypes.LASSO_REGRESSION,
                        MLModelTypes.DECISION_TREE, MLModelTypes.RANDOM_FOREST, MLModelTypes.XGBOOST,

@@ -5,7 +5,6 @@ from helpers import initialize_global_session_variables_if_not_yet, download_dat
 
 # Return the dataset back to the initial state
 def reset_dataset():
-    print("Dataset resetting")
     # Get the dataset from cache
     st.session_state.df = download_dataset()
     st.session_state.df2 = download_dataset()

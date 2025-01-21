@@ -10,21 +10,18 @@ from DashboardManager.MDBoxItem import MDBoxItem
 from DashboardManager.Model.Model import MLModel
 from helpers import initialize_global_session_variables_if_not_yet
 
+st.set_page_config(page_title="CarLab Model", page_icon="🤖")
+
 initialize_global_session_variables_if_not_yet()
 PAGE_NUMBER = os.path.basename(__file__).split("_")[0]  # The number in front of the filename
 
-st.set_page_config(page_title="CarLab Model", page_icon="🤖")
 
 def update_model_item_state(what_to_update: str, changed_field_key: str) -> None:
-    # print("error here:", item_id, what_to_update, changed_field_key, manager.items, st.session_state)
-    # print("Before update:", manager.items, st.session_state[changed_field_key])
 
     ml_model[what_to_update] = st.session_state[changed_field_key]
 
 
 def update_non_model_item_state(item_id: int, what_to_update: str, changed_field_key: str) -> None:
-    # print("error here:", item_id, what_to_update, changed_field_key, manager.items, st.session_state)
-    # print("Before update:", manager.items, st.session_state[changed_field_key])
 
     if what_to_update == "chart_type":
         manager.items[item_id][what_to_update] = ChartTypes.from_string(st.session_state[changed_field_key])
@@ -33,9 +30,6 @@ def update_non_model_item_state(item_id: int, what_to_update: str, changed_field
 
 
 def create_some_item(item_type: DashboardItemTypes, manager: DashboardManager, item_pos: int, *args, **kwargs):
-    # print("create_some_item")
-    # if "df" in kwargs:
-    #     print("create_some_item", weakref.ref(kwargs["df"]))
     manager.create_item(item_type, item_pos, *args, **kwargs)
 
 

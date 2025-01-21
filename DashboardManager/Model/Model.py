@@ -1,5 +1,3 @@
-import numpy as np
-import pandas as pd
 import streamlit as st
 from pandas import DataFrame
 from sklearn.model_selection import train_test_split
@@ -8,16 +6,9 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 from xgboost import XGBRegressor
-from lightgbm import LGBMRegressor
 from catboost import CatBoostRegressor
-# from tensorflow.keras.models import Sequential
-# from tensorflow.keras.layers import Dense
-# from tensorflow.keras.optimizers import Adam, SGD
-# from tensorflow.keras.losses import MeanSquaredError
 
-from DashboardManager.DashboardManagerEnums import MLModelTypes
-from DashboardManager.Model.ModelRelatedEnums import LossFunctions, NeuralNetworkActivations, NeuralNetworkOptimizers, \
-    NeuralNetworkLossFunctions
+from DashboardManager.Model.ModelRelatedEnums import LossFunctions, MLModelTypes
 
 
 class MLModel:
@@ -59,7 +50,7 @@ class MLModel:
 
             # --- Random Forest Parameters ---
             instance.n_estimators = 100  # Number of trees (int > 0)
-            instance.max_features = "auto"  # Number of features to consider for splitting ("auto", "sqrt", "log2", or int)
+            instance.max_features = "sqrt"  # Number of features to consider for splitting ("sqrt", "log2", ..)
 
             # --- Gradient Boosting Parameters (XGBoost, LightGBM, CatBoost) ---
             instance.learning_rate = 0.1  # Step size shrinkage (float > 0)
@@ -68,14 +59,6 @@ class MLModel:
 
             # --- CatBoost-specific Parameters ---
             instance.task_type = "CPU"  # Device to use ("CPU" or "GPU")
-
-            # --- Neural Network Parameters ---
-            instance.hidden_layers = [64, 32]  # List specifying the number of neurons in each layer
-            instance.activation = NeuralNetworkActivations.RELU  # Activation function (use NeuralNetworkActivations Enum)
-            instance.optimizer = NeuralNetworkOptimizers.ADAM  # Optimizer (use NeuralNetworkOptimizers Enum)
-            instance.loss_function = NeuralNetworkLossFunctions.MSE  # Loss function (use NeuralNetworkLossFunctions Enum)
-            instance.epochs = 50  # Number of epochs (int > 0)
-            instance.batch_size = 32  # Batch size (int > 0)
 
             st.session_state["ml_model"] = instance
         return st.session_state["ml_model"]
@@ -149,13 +132,6 @@ class MLModel:
                 random_state=self.random_state
             )
 
-        elif self.model_type == MLModelTypes.LIGHTGBM:
-            model = LGBMRegressor(
-                n_estimators=self.n_estimators,
-                learning_rate=self.learning_rate,
-                random_state=self.random_state
-            )
-
         elif self.model_type == MLModelTypes.CATBOOST:
             model = CatBoostRegressor(
                 iterations=self.n_estimators,
@@ -208,13 +184,13 @@ class MLModel:
         st.success("Training complete!")
 
         # Combine test features, true values, and predictions into a single DataFrame
-        results_df = test_X.copy()  # Скопируем все столбцы из тестового набора
-        results_df["True_Value"] = test_y.values  # Добавляем истинные значения
-        results_df["Prediction"] = test_preds  # Добавляем предсказания
+        results_df = test_X.copy()  # Copy all columns from the test set
+        results_df["True_Value"] = test_y.values  # Adding true values
+        results_df["Prediction"] = test_preds  # Adding predictions
 
-        # Отобразим только первые 15 строк для удобства
+        # Display the generated dataset to the user
         st.write("Sample of Test Results:")
-        st.dataframe(results_df.head(15))
+        st.dataframe(results_df.head())
 
         # Save the model and metrics
         self.model = model

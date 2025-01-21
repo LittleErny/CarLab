@@ -33,16 +33,16 @@ def do_preprocessing(param_name: str, param_value):
                 # st.write(mapping)
                 for key, value in mapping.items():
                     if value == param_value:
-                        return key
+                        return int(key)
             else:
                 pass
 
     return param_value  # do nothing
 
 
+st.set_page_config(page_title="CarLab How Much Would Your Car Cost", page_icon="🧪")
 initialize_global_session_variables_if_not_yet()
 PAGE_NUMBER = os.path.basename(__file__).split("_")[0]  # The number in front of the filename
-st.set_page_config(page_title="CarLab How Much Would Your Car Cost", page_icon="🧪")
 
 df: DataFrame = st.session_state.df2
 init_df = st.session_state.df
@@ -60,7 +60,7 @@ else:
     st.write("")
     x_data = []
     col1, col2 = st.columns([1, 1])
-    col1.write("##### **Please input here the data about your car**",)
+    col1.write("##### **Please input here the data about your car**", )
     col2.write("##### **The values as they will be transferred to the model**")
 
     col1, col2 = st.columns([1, 1])
@@ -73,9 +73,9 @@ else:
         col1, col2 = st.columns([1, 1])
         # Get the input value from the user
         col1.selectbox("Please select the type of desired car",
-                                      sorted(list(set(init_df["vehicle_type"]))),
-                                      index=0,
-                                      key="p6_vehicle_type")
+                       sorted(list(set(init_df["vehicle_type"]))),
+                       index=0,
+                       key="p6_vehicle_type")
 
         vehicle_type = st.session_state["p6_vehicle_type"]
 
@@ -244,7 +244,8 @@ else:
     input_data = pd.DataFrame([x_data], columns=ml_model.x_column_names)
     st.write("*X_data* preview:")
     st.write(input_data)
-    # Выполняем предсказание
+
+    # Making the prediction
     if st.button("Predict"):
         prediction = int(ml_model.model.predict(input_data)[0])
         st.write(f"Approximated Auto Cost: ``{prediction}`` EUR")

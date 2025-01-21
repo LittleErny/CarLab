@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 from helpers import initialize_global_session_variables_if_not_yet
 
 
