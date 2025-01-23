@@ -1,6 +1,6 @@
 Student 1: `Avrutskii, Mikhail`, `12306524`
 
-Student 2: `Safronov, Mikhail`, `Mat-No `
+Student 2: `Safronov, Mikhail`, `Mat-No`
 
 # CarLab
 
@@ -57,16 +57,13 @@ To run the app, see the **Basic Usage** section.
 ## Data
 The Dataset used in our project can be found on [Kaggle](https://www.kaggle.com/datasets/shaunoilund/auto-sales-ebay-germany-random-50k-cleaned/) free of charge. The dataset is distributed with *CC0 1.0 Universal* Linence, which allows copying, modifying, distributing and performing the work without asking permission. 
 
-If you want to see the data description, as well as approaches of handling outliers and creating fake data, please see the [Dataset]() page in our Wiki or run the project.
+If you want to see the data description, as well as approaches of handling outliers and creating fake data, please see the [Data](https://mygit.th-deg.de/ma06524/sas-thd/-/wikis/Data) page in our Wiki or run the project.
 
-# TODO: INCLUDE LINK TO WIKI!!!!!
 
 ## Basic Usage
 ToDo:
 Explain how to start and use the project. Include steps for:
 - Running the application.
-- Initial logins or passwords (if applicable).
-- Key use cases.
 
 ## Implementation of the Requests
 
