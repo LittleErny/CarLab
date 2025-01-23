@@ -7,7 +7,7 @@ from DashboardManager.Model.ModelRelatedEnums import LossFunctions, MLModelTypes
 
 LIST_OF_MODEL_TYPES = [MLModelTypes.LINEAR_REGRESSION, MLModelTypes.RIDGE_REGRESSION, MLModelTypes.LASSO_REGRESSION,
                        MLModelTypes.DECISION_TREE, MLModelTypes.RANDOM_FOREST, MLModelTypes.XGBOOST,
-                       MLModelTypes.LIGHTGBM, MLModelTypes.CATBOOST, MLModelTypes.NEURAL_NETWORK]
+                       MLModelTypes.CATBOOST]
 
 
 class ModelSettingItem(DashboardItem):
@@ -78,6 +78,15 @@ class ModelSettingItem(DashboardItem):
 
         elif self.ml_model.model_type == MLModelTypes.RANDOM_FOREST:
             st.number_input(
+                "Max Depth",
+                value=self.ml_model.max_depth if self.ml_model.max_depth else -1,
+                min_value=-1,
+                key="input_max_depth",
+                help="Maximum depth of the tree. Set to -1 for unlimited depth.",
+                on_change=self.on_change_function,
+                kwargs={"what_to_update": "max_depth", "changed_field_key": "input_max_depth"}
+            )
+            st.number_input(
                 "Number of Estimators",
                 value=self.ml_model.n_estimators,
                 min_value=1,
@@ -96,7 +105,7 @@ class ModelSettingItem(DashboardItem):
                 kwargs={"what_to_update": "max_features", "changed_field_key": "input_max_features"}
             )
 
-        elif self.ml_model.model_type in [MLModelTypes.XGBOOST, MLModelTypes.LIGHTGBM]:
+        elif self.ml_model.model_type == MLModelTypes.XGBOOST:
             st.number_input(
                 "Learning Rate",
                 value=self.ml_model.learning_rate,

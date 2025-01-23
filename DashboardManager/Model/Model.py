@@ -1,3 +1,4 @@
+import numpy as np
 import streamlit as st
 from pandas import DataFrame
 from sklearn.model_selection import train_test_split
@@ -9,6 +10,7 @@ from xgboost import XGBRegressor
 from catboost import CatBoostRegressor
 
 from DashboardManager.Model.ModelRelatedEnums import LossFunctions, MLModelTypes
+from helpers import reverse_preprocessing
 
 
 class MLModel:
@@ -100,8 +102,8 @@ class MLModel:
 
         model = None
         progress = st.progress(0)
-
         if self.model_type == MLModelTypes.LINEAR_REGRESSION:
+            # print("LINEAR_REGRESSION!!!")
             model = LinearRegression()
 
         elif self.model_type == MLModelTypes.RIDGE_REGRESSION:
@@ -112,7 +114,7 @@ class MLModel:
 
         elif self.model_type == MLModelTypes.DECISION_TREE:
             model = DecisionTreeRegressor(
-                max_depth=self.max_depth,
+                max_depth=self.max_depth if self.max_depth != 1 else 1000,
                 min_samples_split=self.min_samples_split,
                 min_samples_leaf=self.min_samples_leaf,
                 random_state=self.random_state
@@ -120,6 +122,7 @@ class MLModel:
 
         elif self.model_type == MLModelTypes.RANDOM_FOREST:
             model = RandomForestRegressor(
+                max_depth=self.max_depth if self.max_depth != 1 else 1000,
                 n_estimators=self.n_estimators,
                 max_features=self.max_features,
                 random_state=self.random_state
@@ -141,58 +144,46 @@ class MLModel:
                 random_state=self.random_state
             )
 
-        elif self.model_type == MLModelTypes.NEURAL_NETWORK:
-            st.write("Not implemented yet")
-            # model = Sequential()
-            # for units in self.hidden_layers:
-            #     model.add(Dense(units, activation=self.activation.value))
-            # model.add(Dense(1))  # Output layer
-            #
-            # optimizer = Adam() if self.optimizer == NeuralNetworkOptimizers.ADAM else SGD()
-            # loss = MeanSquaredError()
-            # model.compile(optimizer=optimizer, loss=loss)
-            #
-            # model.fit(
-            #     train_X, train_y,
-            #     validation_data=(val_X, val_y) if val_X is not None else None,
-            #     epochs=self.epochs,
-            #     batch_size=self.batch_size,
-            #     verbose=0,
-            #     callbacks=[
-            #         st.progress(1) for epoch in range(1, self.epochs + 1)
-            #     ]
-            # )
-
-        # Training (non-neural network models)
-        if model is not None and not self.model_type == MLModelTypes.NEURAL_NETWORK:
+        # Training
+        if model is not None:
             model.fit(train_X, train_y)
 
         # Validation and Testing
-        train_metrics, val_metrics, test_metrics = None, None, None
+        train_mse, val_mse, test_mse = None, None, None
+        train_nmse, val_nmse, test_nmse = None, None, None
 
         train_preds = model.predict(train_X)
-        train_metrics = mean_squared_error(train_y, train_preds)
+        train_mse = mean_squared_error(train_y, train_preds)
+
+        variance_target = np.var(train_y, ddof=1)  #
+        train_nmse = train_mse / variance_target if variance_target != 0 else float('inf')
 
         if val_X is not None:
             val_preds = model.predict(val_X)
-            val_metrics = mean_squared_error(val_y, val_preds)
+            val_mse = mean_squared_error(val_y, val_preds)
 
-        test_preds = model.predict(test_X).astype(int)
-        test_metrics = mean_squared_error(test_y, test_preds)
+            variance_target = np.var(val_y, ddof=1)  #
+            val_nmse = val_mse / variance_target if variance_target != 0 else float('inf')
+
+        test_preds = model.predict(test_X)
+        test_mse = mean_squared_error(test_y, test_preds)
+
+        variance_target = np.var(test_y, ddof=1)  #
+        test_nmse = test_mse / variance_target if variance_target != 0 else float('inf')
 
         # Display results
         st.success("Training complete!")
 
         # Combine test features, true values, and predictions into a single DataFrame
         results_df = test_X.copy()  # Copy all columns from the test set
-        results_df["True_Value"] = test_y.values  # Adding true values
-        results_df["Prediction"] = test_preds  # Adding predictions
+        results_df["True_Value"] = [reverse_preprocessing("price_EUR", i) for i in test_y.values]  # Adding true values
+        results_df["Prediction"] = [int(reverse_preprocessing("price_EUR", i)) for i in test_preds]  # Adding predictions
 
         # Display the generated dataset to the user
         st.write("Sample of Test Results:")
-        st.dataframe(results_df.head())
+        st.dataframe(results_df.head(15))
 
         # Save the model and metrics
         self.model = model
-        self.metrics = (train_metrics, val_metrics, test_metrics)
-
+        self.metrics = (train_mse, val_mse, test_mse, train_nmse, val_nmse, test_nmse)
+        # print("Metrics: ", self.metrics)

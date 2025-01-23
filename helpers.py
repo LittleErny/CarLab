@@ -69,6 +69,9 @@ def initialize_global_session_variables_if_not_yet():
         # The second is for page 3 and later - can be edited in preprocessing function
         st.session_state.df2 = download_dataset()
 
+        # The Dataframe for Fake Data
+        st.session_state.fake_df = pd.DataFrame()
+
         st.session_state.df_quantitative = None
 
         # st.session_state.df_quantitative = pd.DataFrame()
@@ -85,13 +88,16 @@ def initialize_global_session_variables_if_not_yet():
         st.session_state.preprocessing_history = []
 
         st.session_state.page_2_was_ever_rendered = False
+        st.session_state.page_3_was_ever_rendered = False
 
         st.success('Dataset was successfully downloaded from Kaggle!')
         print("-------------------------------------")
-        print("The App is run.")
+        print("The App is running.")
         print("-------------------------------------")
 
-def execute_preprocessing_action(action_type, manager, df, column=None, method=None, mapping=None, threshold=None, scaling_method=None):
+
+def execute_preprocessing_action(action_type, manager, df, column=None, method=None, mapping=None, threshold=None,
+                                 scaling_method=None):
     """
     Executes a preprocessing action based on the given parameters.
 
@@ -101,8 +107,6 @@ def execute_preprocessing_action(action_type, manager, df, column=None, method=N
     :param threshold: Threshold value for preprocessing.
     :param scaling_method: Scaling method (e.g., 'Min-Max Scaling', 'Standard Scaling').
     """
-
-
 
     if action_type == PreprocessingTypes.OUTLIER_REMOVAL:
         if not column or not method or threshold is None:
@@ -176,6 +180,8 @@ def execute_preprocessing_action(action_type, manager, df, column=None, method=N
         if not column or not scaling_method:
             raise ValueError("Missing parameters for SCALING.")
 
+        mini, maxi = df[column].min(), df[column].max()
+
         if scaling_method == "Min-Max Scaling":
             df[column] = ((df[column] - df[column].min()) /
                           (df[column].max() - df[column].min()))
@@ -186,12 +192,14 @@ def execute_preprocessing_action(action_type, manager, df, column=None, method=N
                     "column": column,
                     "method": method,
                     "scaling_method": scaling_method,
-                    "min": df[column].min(),
-                    "max": df[column].max()
+                    "min": mini,
+                    "max": maxi
                 }
             )
 
         elif scaling_method == "Standard Scaling":
+            meani, stdi = df[column].mean(), df[column].std()
+
             df[column] = (df[column] - df[column].mean()) / df[column].std()
 
             st.session_state.preprocessing_history.append(
@@ -200,8 +208,8 @@ def execute_preprocessing_action(action_type, manager, df, column=None, method=N
                     "column": column,
                     "method": method,
                     "scaling_method": scaling_method,
-                    "mean": df[column].mean(),
-                    "std": df[column].std()
+                    "mean": meani,
+                    "std": stdi
                 }
             )
 
@@ -223,3 +231,71 @@ def execute_preprocessing_action(action_type, manager, df, column=None, method=N
 
     else:
         raise ValueError(f"Unknown action_type: {action_type}")
+
+
+def do_preprocessing(param_name: str, param_value):
+    for action in st.session_state.preprocessing_history:
+
+        # If the action was executed on target parameter:
+        if param_name == action["column"]:
+
+            # If it was scaling:
+            if action["preproc_type"] == PreprocessingTypes.SCALING:
+                print("SCALIIIIING!")
+                if action["scaling_method"] == "Min-Max Scaling":
+                    mini, maxi = action["min"], action["max"]
+                    print("MIN-MAX", mini, maxi, (param_value - mini) / (maxi - mini))
+                    return (param_value - mini) / (maxi - mini)
+                elif action["scaling_method"] == "Standard Scaling":
+                    mean, std = action["mean"], action["std"]
+                    print("STD", mean, std, (param_value - mean) / std)
+                    return (param_value - mean) / std
+                else:
+                    raise ValueError(f"Unknown scaling_method: {action['scaling_method']}")
+
+            # Elif it was label encoding
+            elif action["preproc_type"] == PreprocessingTypes.LABEL_ENCODING:
+                # Then just look for the needed key
+                mapping = action["mapping"]
+                # st.write(mapping)
+                for key, value in mapping.items():
+                    if value == param_value:
+                        return int(key)
+            else:
+                pass
+
+    return param_value  # do nothing
+
+
+def reverse_preprocessing(param_name: str, param_value):
+    for action in st.session_state.preprocessing_history:
+
+        # If the action was executed on target parameter:
+        if param_name == action["column"]:
+
+            # If it was scaling:
+            if action["preproc_type"] == PreprocessingTypes.SCALING:
+                # print("SCALIIIIING!")
+                if action["scaling_method"] == "Min-Max Scaling":
+                    mini, maxi = action["min"], action["max"]
+                    # print("MIN-MAX", mini, maxi, (param_value - mini) / (maxi - mini))
+                    return param_value * (maxi - mini) + mini
+                elif action["scaling_method"] == "Standard Scaling":
+                    mean, std = action["mean"], action["std"]
+                    print("STD", mean, std, (param_value - mean) / std)
+                    return param_value * std + mean
+                else:
+                    raise ValueError(f"Unknown scaling_method: {action['scaling_method']}")
+
+            # Elif it was label encoding
+            elif action["preproc_type"] == PreprocessingTypes.LABEL_ENCODING:
+                # Then just look for the needed key
+                mapping = action["mapping"]
+                # st.write(mapping)
+                for key, value in mapping.items():
+                    if value == param_value:
+                        return int(key)
+            else:
+                pass
+
+    return param_value  # do nothing

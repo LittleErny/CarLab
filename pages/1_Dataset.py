@@ -4,10 +4,10 @@ from helpers import initialize_global_session_variables_if_not_yet, download_dat
 
 
 # Return the dataset back to the initial state
-def reset_dataset():
-    # Get the dataset from cache
-    st.session_state.df = download_dataset()
-    st.session_state.df2 = download_dataset()
+# def reset_dataset():
+#     # Get the dataset from cache
+#     st.session_state.df = download_dataset()
+#     st.session_state.df2 = download_dataset()
 
 
 # -------- Start of the page execution --------
@@ -20,16 +20,18 @@ initialize_global_session_variables_if_not_yet()
 
 # Dataset description
 st.title("Auto Sales Dataset Overview")
-st.write("If you want to have a precise look at the dataset, place the cursor on the dataset and click the ``Fullscreen`` button in the upper right corner ->")
-st.write("If you want to download the dataset, place the cursor on the dataset and click the ``Download`` button in the upper right corner ->")
-
+st.write(
+    "If you want to have a precise look at the dataset, place the cursor on the dataset and click the ``Fullscreen`` "
+    "button in the upper right corner ->")
+st.write(
+    "If you want to download the dataset, place the cursor on the dataset and click the ``Download`` button in the upper"
+    " right corner ->")
 
 # Display the dataset
 st.write(st.session_state.df)
 
-
-# Reset dataset button
-st.button("🔄 Reset Dataset", on_click=reset_dataset)
+# Reset dataset button (to be implemented in the future versions)
+# st.button("🔄 Reset Dataset", on_click=reset_dataset)
 
 st.markdown("""
 ---
@@ -63,4 +65,3 @@ Note: Some other columns from the initial dataset were excluded, as they were no
 st.write("### Data types in the Dataset:")
 st.write("Note: ``object`` is actually a string.")
 st.write(st.session_state.df2.dtypes)
-

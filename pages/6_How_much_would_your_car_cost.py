@@ -6,39 +6,8 @@ from pandas import DataFrame
 
 from DashboardManager.DashboardManagerEnums import PreprocessingTypes
 from DashboardManager.Model.Model import MLModel
-from helpers import initialize_global_session_variables_if_not_yet, CATEGORICAL_COLUMNS, NUMERICAL_COLUMNS
-
-
-def do_preprocessing(param_name: str, param_value):
-    for action in st.session_state.preprocessing_history:
-
-        # If the action was executed on target parameter:
-        if param_name == action["column"]:
-
-            # If it was scaling:
-            if action["preproc_type"] == PreprocessingTypes.SCALING:
-                if action["scaling_method"] == "Min-Max Scaling":
-                    mini, maxi = action["min"], action["max"]
-                    return (param_value - mini) / (maxi - mini)
-                elif action["scaling_method"] == "Standard Scaling":
-                    mean, std = action["mean"], action["std"]
-                    return (param_value - mean) / std
-                else:
-                    raise ValueError(f"Unknown scaling_method: {action['scaling_method']}")
-
-            # Elif it was label encoding
-            elif action["preproc_type"] == PreprocessingTypes.LABEL_ENCODING:
-                # Then just look for the needed key
-                mapping = action["mapping"]
-                # st.write(mapping)
-                for key, value in mapping.items():
-                    if value == param_value:
-                        return int(key)
-            else:
-                pass
-
-    return param_value  # do nothing
-
+from helpers import initialize_global_session_variables_if_not_yet, CATEGORICAL_COLUMNS, NUMERICAL_COLUMNS, \
+    reverse_preprocessing, do_preprocessing
 
 st.set_page_config(page_title="CarLab How Much Would Your Car Cost", page_icon="🧪")
 initialize_global_session_variables_if_not_yet()
@@ -133,6 +102,7 @@ else:
             step=1,
             value=100,
             key="p6_power_ps",
+            help="Make sure better not to put in too big number that was excluded with outliers on previous pages."
         )
         power_ps = st.session_state["p6_power_ps"]
         new_value = do_preprocessing("power_ps", power_ps)
@@ -247,5 +217,7 @@ else:
 
     # Making the prediction
     if st.button("Predict"):
-        prediction = int(ml_model.model.predict(input_data)[0])
-        st.write(f"Approximated Auto Cost: ``{prediction}`` EUR")
+
+        prediction = ml_model.model.predict(input_data)[0]
+        reversed_prediction = reverse_preprocessing("price_EUR", prediction)
+        st.write(f"Approximated Auto Cost: ``{int(reversed_prediction)}`` EUR")

@@ -17,12 +17,10 @@ PAGE_NUMBER = os.path.basename(__file__).split("_")[0]  # The number in front of
 
 
 def update_model_item_state(what_to_update: str, changed_field_key: str) -> None:
-
     ml_model[what_to_update] = st.session_state[changed_field_key]
 
 
 def update_non_model_item_state(item_id: int, what_to_update: str, changed_field_key: str) -> None:
-
     if what_to_update == "chart_type":
         manager.items[item_id][what_to_update] = ChartTypes.from_string(st.session_state[changed_field_key])
     else:
@@ -36,13 +34,21 @@ def create_some_item(item_type: DashboardItemTypes, manager: DashboardManager, i
 manager = DashboardManager(PAGE_NUMBER)
 df = st.session_state.df2
 
+st.write("# Model")
+st.write("Here you can choose, set up, and train your model.")
+
 if manager.is_empty():
     ml_model = MLModel(df)
 
     manager.create_item(DashboardItemTypes.MD_BOX,
                         item_pos=0,
                         on_change_function=update_non_model_item_state,
-                        content="MD_Box before model selection.")
+                        content="""
+Now it's time to train some model to be able to do predictions. If you are not in the hardcore mode,
+ you can see the table with my results in the bottom of this page. Good luck! 
+ 
+Note: It's better to do some preprocessing actions before model training - especially labelling😉
+""")
 
     manager.create_item(DashboardItemTypes.MODEL_SELECTION,
                         item_pos=1,
@@ -50,27 +56,44 @@ if manager.is_empty():
                         on_change_function=update_model_item_state
                         )
 
-    manager.create_item(DashboardItemTypes.MD_BOX,
-                        item_pos=2,
-                        on_change_function=update_non_model_item_state,
-                        content="Then we should set up our model")
-
     manager.create_item(DashboardItemTypes.MODEL_SETTING,
+                        item_pos=2,
+                        ml_model=ml_model,
+                        on_change_function=update_model_item_state
+                        )
+
+    manager.create_item(DashboardItemTypes.MODEL_TRAINING,
                         item_pos=3,
                         ml_model=ml_model,
                         on_change_function=update_model_item_state
                         )
+    if not st.session_state.hardcore_mode:
+        manager.create_item(DashboardItemTypes.MD_BOX,
+                            item_pos=4,
+                            on_change_function=update_non_model_item_state,
+                            content="""
+Here is the rating of all the tried models in 
+their best configurations, as I succeed to achieve.
 
-    manager.create_item(DashboardItemTypes.MD_BOX,
-                        item_pos=4,
-                        on_change_function=update_non_model_item_state,
-                        content="Then we should train our model")
+| Model              | MSE (Min-Max) | MSE (Standard) | NMSE (Min-Max)  | NMSE (Standard)  |
+|--------------------|---------------|----------------|-----------------|------------------|
+| Linear Reg.        | 0.0094        | 0.4133         | 0.4158          | 0.4158           |
+| Ridge Reg.         | 0.0094        | 0.4133         | 0.4158          | 0.4158           |
+| Lasso Reg.         | 0.0220        | 0.9768         | 0.9930          | 0.9827           |
+| Decision Tree*     | 0.0045        | 0.1984         | 0.1987          | 0.1996           |
+| Random Forest**    | 0.0033        | 0.1534         | 0.1536          | 0.1543           |
+| XGBoost***         | 0.0030        | 0.1355         | 0.1364          | 0.1364           |
+| CatBoost           | 0.0036        | 0.1723         | 0.1734          | 0.1734           |
 
-    manager.create_item(DashboardItemTypes.MODEL_TRAINING,
-                        item_pos=5,
-                        ml_model=ml_model,
-                        on_change_function=update_model_item_state
-                        )
+*- Decision Tree with max_depth=10
+
+**- Random Forest with max_depth=10 and number_of_estimators=20
+
+***- XGBoost with learning_rate=0.2, number_of_estimators=20, loss_func="Squared Error"
+
+Note: The random_state=42 for each model.
+""")
+
 
 for item_id, item in manager.items.items():
 
@@ -133,19 +156,21 @@ for item_id, item in manager.items.items():
         # The bottom of Container
         col1, col2, col3 = st.columns([2, 2, 2])  # The ratio 2:2:2 so that the buttons look good
         with col1:
-            # Deletes the graph
-            if st.button("❌ **Delete Block**", key=f"delete_{item_id}"):
-                manager.remove_item(item_id)
-                st.rerun()
+            # Deletes the block
+            if item.get_type() == DashboardItemTypes.MD_BOX:
+                if st.button("❌ **Delete Block**", key=f"delete_{item_id}"):
+                    manager.remove_item(item_id)
+                    st.rerun()
         with col2:
+            pass
             # Creates a new sample graph below
-            st.button(
-                "➕ **Add New Chart Below**",
-                key=f"add_chart_{item_id}",
-                on_click=create_some_item,
-                args=(DashboardItemTypes.CHART, manager, item_id),
-                kwargs={"on_change_function": update_non_model_item_state, "df": df}
-            )
+            # st.button(
+            #     "➕ **Add New Chart Below**",
+            #     key=f"add_chart_{item_id}",
+            #     on_click=create_some_item,
+            #     args=(DashboardItemTypes.CHART, manager, item_id),
+            #     kwargs={"on_change_function": update_non_model_item_state, "df": df}
+            # )
 
         with col3:
             # Creates a sample MD Box below

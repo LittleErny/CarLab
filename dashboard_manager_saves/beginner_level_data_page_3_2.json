@@ -33,7 +33,7 @@
     },
     "4": {
         "type": "CHART",
-        "title": "Distribution of price_EUR after Outlier Removal",
+        "title": "Distribution of power_ps after Outlier Removal",
         "chart_type": "ChartTypes.BOXPLOT",
         "amount_of_params": 1,
         "x": "power_ps",

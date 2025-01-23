@@ -191,3 +191,46 @@ class DashboardManager:
         """
         items_data = {item_id: json.loads(str(item)) for item_id, item in self.items.items()}
         return json.dumps(items_data, indent=4, ensure_ascii=False)
+
+    def reload_items(self, on_change_function, df):
+        """Recreates all the items to update their info"""
+
+        items_data = {
+            item_id: json.loads(str(item)) for item_id, item in self.items.items()
+        }
+
+        for i in items_data.values():
+            if "df_ref" in i:
+                del i["df_ref"]
+
+        self.items.clear()
+        for item_id, item_data in items_data.items():
+            item_type = DashboardItemTypes[item_data["type"]]  # Extract the item type
+            del item_data["type"]  # Remove type from the data as it's used for initialization
+            if item_type == DashboardItemTypes.CHART:
+                new_item = ChartItem(id=int(item_id), on_change_function=on_change_function, df=df)
+                for key, value in item_data.items():
+                    new_item[key] = value
+            elif item_type == DashboardItemTypes.MD_BOX:
+                new_item = MDBoxItem(manager_page_number=self.page_number, on_change_function=on_change_function)
+                for key, value in item_data.items():
+                    new_item[key] = value
+            elif item_type == DashboardItemTypes.PREPROCESSING_BOX:
+                preproc_type = item_data["preprocessing_type"]
+                action = item_data["action"]
+                new_item = PreprocessingItem(action=action, preproc_type=preproc_type)
+                execute_preprocessing_action(
+                    action_type=preproc_type,
+                    manager=self,
+                    df=df,
+                    column=action["column"] if "column" in action else None,
+                    method=action["method"] if "method" in action else None,
+                    scaling_method=action["scaling_method"] if "scaling_method" in action else None,
+                    mapping=action["mapping"] if "mapping" in action else None,
+                    threshold=action["threshold"] if "threshold" in action else None
+                )
+            else:
+                raise ValueError(f"Unsupported item type: {item_type}")
+            self.items[int(item_id)] = new_item
+
+        # st.rerun()

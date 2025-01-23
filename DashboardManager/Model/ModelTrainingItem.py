@@ -7,7 +7,7 @@ from DashboardManager.Model.ModelRelatedEnums import MLModelTypes
 
 LIST_OF_MODEL_TYPES = [MLModelTypes.LINEAR_REGRESSION, MLModelTypes.RIDGE_REGRESSION, MLModelTypes.LASSO_REGRESSION,
                        MLModelTypes.DECISION_TREE, MLModelTypes.RANDOM_FOREST, MLModelTypes.XGBOOST,
-                       MLModelTypes.LIGHTGBM, MLModelTypes.CATBOOST, MLModelTypes.NEURAL_NETWORK]
+                       MLModelTypes.CATBOOST]
 
 
 class ModelTrainingItem(DashboardItem):
@@ -44,28 +44,48 @@ class ModelTrainingItem(DashboardItem):
         # Checkbox for using validation data
         use_validation_data = validation_percent != 0
 
-
-
         # Button to start training
         if st.button("Start Training"):
-            with (st.spinner("Training in progress...")):
-                # Call the training method
-                self.ml_model.train_model(
-                    train_size=train_percent / 100,
-                    validation_size=validation_percent / 100,
-                    test_size=test_percent / 100,
-                )
+            try:
+                # print("Training model of type:", self.ml_model.model_type)
+                # print("max_depth", self.ml_model.max_depth)
+                with (st.spinner("Training in progress...")):
+                    # Call the training method
+                    self.ml_model.train_model(
+                        train_size=train_percent / 100,
+                        validation_size=validation_percent / 100,
+                        test_size=test_percent / 100,
+                    )
+            except Exception as e:
+                st.error("Some Error occurred when trying to train model. Please make sure that all the preprocessing"
+                         "actions are done. If the error still occurs, refer to error stack below")
+
+                with st.expander("Error Stack:"):
+                    st.error(e.with_traceback())
 
         # If we have trained the model already, then show its metrics
         if self.ml_model.model is not None:
 
-            train_metrics, val_metrics, test_metrics = self.ml_model.metrics
+            train_mse, val_mse, test_mse, train_nmse, val_nmse, test_nmse = self.ml_model.metrics
 
             # Display results in an expander
             with st.expander("Training Results", expanded=True):
+                col1, col2 = st.columns([1, 1])
 
-                st.write("### Metrics")
-                st.write(f"**Training MSE:** {train_metrics:.10f}")
+                col1.write("##### Mean Square Error (MSE)")
+                col1.write("One **should not** use it for comparing models with "
+                           "different types of numerical parameter scaling")
+
+                col1.write(f"**Training MSE:** `{train_mse:.6f}`")
                 if use_validation_data:
-                    st.write(f"**Validation MSE:** {val_metrics:.10f}")
-                st.write(f"**Test MSE:** {test_metrics:.10f}")
+                    col1.write(f"**Validation MSE:** `{val_mse:.6f}`")
+                col1.write(f"**Test MSE:** `{test_mse:.6f}`")
+
+                col2.write("##### Normalized MSE")
+                col2.write("Is used for comparing models with "
+                           "different types of numerical parameter scaling")
+
+                col2.write(f"**Training MSE:** `{train_nmse:.6f}`")
+                if use_validation_data:
+                    col2.write(f"**Validation MSE:** `{val_nmse:.6f}`")
+                col2.write(f"**Test MSE:** `{test_nmse:.6f}`")

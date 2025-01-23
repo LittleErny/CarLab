@@ -1,7 +1,7 @@
 {
     "0": {
         "type": "MD_BOX",
-        "content": "Welcome to the **Parameters Visualisation** page!\n\nIf it is your first time here, take your time to read the instruction above. However, the interface is quite obvious (especially if you are familiar with Jupiter Notebool), so it's nothing wrong if you skip this step.  ",
+        "content": "Welcome to the **Parameters Visualisation** page!\n\nIf it is your first time here, take your time to read the instruction above. However, the interface is quite obvious (especially if you are familiar with Jupiter Notebook), so it's nothing wrong if you skip this step.  ",
         "manager_page_number": "2",
         "mode": "MdBoxModes.VIEW"
     },

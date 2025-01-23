@@ -39,20 +39,30 @@ def create_some_item(item_type: DashboardItemTypes, manager: DashboardManager, i
     manager.create_item(item_type, item_pos, *args, **kwargs)
 
 
+def reload_charts():
+    # Assuming charts are only in the 2nd manager:
+    manager.reload_items(update_item_state, st.session_state.df2)
+
+
 def render_sidebar_preprocessing_config_bar():
     global df
 
+    st.sidebar.button("🔄 Update Charts",
+                      on_click=reload_charts)
+
+    st.sidebar.write("- - -")
     # Uncomment this to be able to edit saved manager states
     if st.sidebar.button("Save current page state"):
         preproc_manager.save_to_json("dashboard_manager_saves/beginner_level_data_page_3_1.json")
         manager.save_to_json("dashboard_manager_saves/beginner_level_data_page_3_2.json")
 
     if st.sidebar.button("Load page from json"):
-        preproc_manager.load_from_json(update_item_state,
+        preproc_manager.load_from_json(update_item_state_in_preproc_manager,
                                        df,
                                        "dashboard_manager_saves/beginner_level_data_page_3_1.json",
                                        skip_rerun=True  # as we need to load one more manager
                                        )
+
         manager.load_from_json(update_item_state,
                                df,
                                "dashboard_manager_saves/beginner_level_data_page_3_2.json")
@@ -65,7 +75,7 @@ def render_sidebar_preprocessing_config_bar():
         key="p3_preproc_type", index=PREPROCESSING_OPTIONS.index(st.session_state["p3_preproc_type"]),
     )
     selected_type = st.session_state['p3_preproc_type']
-    st.sidebar.write(selected_type)
+    # st.sidebar.write(selected_type)
 
     if selected_type == PreprocessingTypes.OUTLIER_REMOVAL:
         st.sidebar.selectbox("Select column", NUMERICAL_COLUMNS, key="p3_preprocessing_column")
@@ -128,6 +138,7 @@ def render_sidebar_preprocessing_config_bar():
 # In case this page was the first to be load by the user in the whole application,
 # this will initialize them; and do nothing in the opposite case
 initialize_global_session_variables_if_not_yet()
+
 # Initiate local session state variables for some items in the sidebar
 if "p3_preproc_type" not in st.session_state:
     st.session_state.p3_preproc_type = PREPROCESSING_OPTIONS[0]
@@ -140,6 +151,17 @@ preproc_manager = DashboardManager(PAGE_NUMBER + ".5")
 
 # And manager for showing the Graphs & MD-Boxes
 manager = DashboardManager(PAGE_NUMBER)
+
+if not st.session_state.hardcore_mode and not st.session_state.page_3_was_ever_rendered:
+    st.session_state.page_3_was_ever_rendered = True
+
+    preproc_manager.load_from_json(update_item_state_in_preproc_manager, df,
+                                   "dashboard_manager_saves/beginner_level_data_page_3_1.json",
+                                   skip_rerun=True)
+
+    manager.load_from_json(update_item_state, df,
+                           "dashboard_manager_saves/beginner_level_data_page_3_2.json",
+                           skip_rerun=True)
 
 render_sidebar_preprocessing_config_bar()
 
@@ -157,9 +179,9 @@ execute all the preprocessing actions, and only then try to visualize them.
 Note: Here and further the copy of initial dataset is used. You will not see any changes in Parameters Visualisation 
 page. 
 
-Note: The same dataset is used on this and Faker page. So, for example, if you create 1000 fake rows on the Faker page,
-it will have impact on the graphs on this page also. So I recommend applying Scaling only after you create additional 
-Fake Data and study it sufficiently.
+Note: The same dataset is used on this and Faker page. So, for example, if you create 1000 fake rows on the Faker page
+and press `🔄 Update Charts` button, it will have impact on the graphs on this page also. 
+So I recommend applying Scaling only after you create additional Fake Data and study it sufficiently.
 
 Note: In current version there is no way to discard particular preprocessing action or mix their order 
 after they were executed. So please make sure to do it in the correct order.

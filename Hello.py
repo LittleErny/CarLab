@@ -22,8 +22,9 @@ Welcome to our exciting *CarLab* project! Here, you'll find everything you need 
 
 ### Resources
 
-- [Dataset](https://www.kaggle.com/datasets/shaunoilund/auto-sales-ebay-germany-random-50k-cleaned/code) 📊
+- [Dataset](https://www.kaggle.com/datasets/shaunoilund/auto-sales-ebay-germany-random-50k-cleaned) 📊
 - [MyGit](https://mygit.th-deg.de/ma06524/sas-thd) 🔗
+- [Wiki](https://mygit.th-deg.de/ma06524/sas-thd/-/wikis/home) 📚
 
 ''')
 
