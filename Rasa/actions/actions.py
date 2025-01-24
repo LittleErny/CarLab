@@ -121,10 +121,10 @@ class ActionProvideRecommendation(Action):
             if slot_value and tracker.get_slot(slot_name) != slot_value:
                 events.append(SlotSet(slot_name, slot_value))
 
-        debug_message = "Current filters based on provided slots:\n"
-        for key, value in filters.items():
-            debug_message += f"- {key}: {value}\n"
-        dispatcher.utter_message(text=debug_message)
+        # debug_message = "Current filters based on provided slots:\n"
+        # for key, value in filters.items():
+        #     debug_message += f"- {key}: {value}\n"
+        # dispatcher.utter_message(text=debug_message)
 
         filtered_data = filter_data(filters)
 
