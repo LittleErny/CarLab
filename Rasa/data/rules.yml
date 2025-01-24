@@ -27,8 +27,43 @@ rules:
     - intent: request_recommendation
     - action: action_provide_recommendation
 
-- rule: interested in car
+- rule: Interested in car
   steps:
     - intent: car_interested
     - action: utter_car_interested
     - action: utter_ask_price_EUR
+
+- rule: Handle provided price and ask for vehicle type
+  steps:
+    - intent: provide_price
+    - action: utter_ask_vehicle_type
+
+- rule: Handle provided vehicle type and ask for registration year
+  steps:
+    - intent: provide_vehicle_type
+    - action: utter_ask_registration_year
+
+- rule: Handle provided registration year and ask for transmission
+  steps:
+    - intent: provide_registration_year
+    - action: utter_ask_transmission
+
+- rule: Handle provided transmission and ask for power
+  steps:
+    - intent: provide_transmission
+    - action: utter_ask_power_ps
+
+- rule: Handle provided power and ask for mileage
+  steps:
+    - intent: provide_power
+    - action: utter_ask_odometer_km
+
+- rule: Handle provided mileage and ask for fuel type
+  steps:
+    - intent: provide_mileage
+    - action: utter_ask_fuel_type
+
+- rule: Handle provided fuel type and ask for brand
+  steps:
+    - intent: provide_fuel_type
+    - action: utter_ask_brand

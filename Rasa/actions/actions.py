@@ -5,6 +5,7 @@ from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.types import DomainDict
 from kagglehub import dataset_download
+from difflib import get_close_matches
 
 # Load dataset from Kaggle
 path = dataset_download("shaunoilund/auto-sales-ebay-germany-random-50k-cleaned")
@@ -14,7 +15,14 @@ try:
 except FileNotFoundError:
     data = None
 
-# Unique values for categorical fields
+# Normalize categorical fields
+if data is not None:
+    data['vehicle_type'] = data['vehicle_type'].str.lower()
+    data['transmission'] = data['transmission'].str.lower()
+    data['fuel_type'] = data['fuel_type'].str.lower()
+    data['brand'] = data['brand'].str.lower()
+
+# Define unique values for categorical fields
 unique_vehicle_types = ["cabrio", "kleinwagen", "suv", "kombi", "limousine", "coupe", "bus", "andere", "unknown"]
 unique_transmissions = ["manuell", "automatik", "unknown"]
 unique_fuel_types = ["unknown", "benzin", "diesel", "lpg", "andere", "cng", "hybrid", "elektro"]
@@ -26,40 +34,67 @@ unique_brands = [
     "lada"
 ]
 
-def extract_text_from_message(message: str, valid_values: List[str]) -> str:
-    """
-    Extracts the first matching value from the list of valid values in the message.
-    """
-    for value in valid_values:
-        if value.lower() in message.lower():
-            return value
+def extract_text_from_message_with_correction(message: str, valid_values: List[str]) -> str:
+    words = re.findall(r"\w+", message.lower())
+    for word in words:
+        match = get_close_matches(word, valid_values, n=1, cutoff=0.8)
+        if match:
+            return match[0]
     return None
 
 def filter_data(filters: Dict[Text, Any]) -> pd.DataFrame:
-    """
-    Filters the dataset based on the provided filters.
-    """
     if data is None:
         return pd.DataFrame()
 
     filtered_data = data.copy()
-    for key, value in filters.items():
-        if value is not None:
-            # Handle numeric filters
-            if key in ["price_EUR", "registration_year", "power_ps", "odometer_km"]:
-                try:
-                    numeric_value = float(value)  # Convert to float
-                    filtered_data = filtered_data[
-                        (filtered_data[key] >= numeric_value * 0.9) & (filtered_data[key] <= numeric_value * 1.1)
-                    ]
-                except ValueError:
-                    # Skip this filter if conversion fails
-                    continue
-            # Handle categorical filters
-            elif isinstance(value, str):
-                filtered_data = filtered_data[filtered_data[key].str.lower() == value.lower()]
+
+    # Step 1: Filter by price
+    if filters.get("price_EUR") is not None:
+        try:
+            price = float(filters["price_EUR"])
+            filtered_data = filtered_data[
+                (filtered_data["price_EUR"] >= price * 0.9) & (filtered_data["price_EUR"] <= price * 1.1)
+            ]
+        except ValueError:
+            pass
+
+    # Step 2: Filter by registration year
+    if filters.get("registration_year") is not None:
+        try:
+            year = int(filters["registration_year"])
+            filtered_data = filtered_data[filtered_data["registration_year"] >= year]
+        except ValueError:
+            pass
+
+    # Step 3: Filter by power
+    if filters.get("power_ps") is not None:
+        try:
+            power = float(filters["power_ps"])
+            filtered_data = filtered_data[
+                (filtered_data["power_ps"] >= power * 0.9) & (filtered_data["power_ps"] <= power * 1.1)
+            ]
+        except ValueError:
+            pass
+
+    # Step 4: Filter by odometer
+    if filters.get("odometer_km") is not None:
+        try:
+            odometer = float(filters["odometer_km"])
+            filtered_data = filtered_data[
+                (filtered_data["odometer_km"] >= odometer * 0.9) & (filtered_data["odometer_km"] <= odometer * 1.1)
+            ]
+        except ValueError:
+            pass
+
+    # Step 5: Filter by categorical fields
+    for key in ["vehicle_type", "transmission", "fuel_type", "brand"]:
+        if filters.get(key) is not None:
+            value = filters[key].lower()
+            filtered_data = filtered_data[filtered_data[key].str.lower() == value]
+
     return filtered_data
 
+from rasa_sdk.events import SlotSet
 
 class ActionProvideRecommendation(Action):
 
@@ -67,28 +102,35 @@ class ActionProvideRecommendation(Action):
         return "action_provide_recommendation"
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
-        # Extract user message
         user_message = tracker.latest_message.get("text", "")
 
-        # Extract and validate slot values
+        # Extract and validate slot values with correction for misspellings
         filters = {
-            "price_EUR": tracker.get_slot("price_EUR"),
+            "price_EUR": tracker.get_slot("price_EUR") or extract_text_from_message_with_correction(user_message, [str(i) for i in range(1000, 1000000, 1000)]),
             "registration_year": tracker.get_slot("registration_year"),
             "power_ps": tracker.get_slot("power_ps"),
             "odometer_km": tracker.get_slot("odometer_km"),
-            "vehicle_type": extract_text_from_message(user_message, unique_vehicle_types),
-            "transmission": extract_text_from_message(user_message, unique_transmissions),
-            "fuel_type": extract_text_from_message(user_message, unique_fuel_types),
-            "brand": extract_text_from_message(user_message, unique_brands),
+            "vehicle_type": tracker.get_slot("vehicle_type") or extract_text_from_message_with_correction(user_message, unique_vehicle_types),
+            "transmission": tracker.get_slot("transmission") or extract_text_from_message_with_correction(user_message, unique_transmissions),
+            "fuel_type": tracker.get_slot("fuel_type") or extract_text_from_message_with_correction(user_message, unique_fuel_types),
+            "brand": tracker.get_slot("brand") or extract_text_from_message_with_correction(user_message, unique_brands),
         }
 
-        # Filter the data
+        events = []
+        for slot_name, slot_value in filters.items():
+            if slot_value and tracker.get_slot(slot_name) != slot_value:
+                events.append(SlotSet(slot_name, slot_value))
+
+        debug_message = "Current filters based on provided slots:\n"
+        for key, value in filters.items():
+            debug_message += f"- {key}: {value}\n"
+        dispatcher.utter_message(text=debug_message)
+
         filtered_data = filter_data(filters)
 
         if filtered_data.empty:
             dispatcher.utter_message(text="Unfortunately, I couldn't find any cars matching your criteria.")
         else:
-            # Select the top 3 most popular cars
             top_cars = (
                 filtered_data
                 .groupby(["brand", "model"])
@@ -98,11 +140,10 @@ class ActionProvideRecommendation(Action):
                 .head(3)
             )
 
-            # Create the response
             response = "Here are the top 3 most popular cars based on your criteria:\n"
             for index, row in top_cars.iterrows():
                 response += f"- {row['brand']} {row['model']} (popularity: {row['popularity']})\n"
 
             dispatcher.utter_message(text=response)
 
-        return []
+        return events

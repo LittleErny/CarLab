@@ -92,33 +92,31 @@ responses:
     - text: "You're welcome! Let me know if you need anything else."
 
   utter_ask_price_EUR:
-    - text: "What is your budget in euros (EUR)?"
+    - text: "What is your budget in euros (EUR), or would you like me to provide a recommendation right away?"
 
   utter_ask_power_ps:
-    - text: "What is the horsepower (HP) you are looking for?"
+    - text: "What is the horsepower (HP) you are looking for, or would you like me to provide a recommendation right away?"
 
   utter_ask_vehicle_type:
-    - text: "What type of vehicle are you interested in? (e.g., cabrio, kleinwagen, SUV, kombi, limousine, coupe, bus, andere, Unknown)"
+    - text: "What type of vehicle are you interested in? (e.g., cabrio, kleinwagen, SUV, kombi, limousine, coupe, bus, andere, Unknown) Or would you like me to provide a recommendation right away?"
 
   utter_ask_transmission:
-    - text: "What type of transmission do you prefer? (e.g., manual, automatic, Unknown)"
+    - text: "What type of transmission do you prefer? (e.g., manuell, automatik, Unknown) Or would you like me to provide a recommendation right away?"
 
   utter_ask_fuel_type:
-    - text: "What type of fuel are you looking for? (e.g., Unknown, petrol, diesel, LPG, other, CNG, hybrid, electric)"
+    - text: "What type of fuel are you looking for? (e.g., unknown, benzin, diesel, lpg, andere, cng, hybrid, elektro) Or would you like me to provide a recommendation right away?"
 
   utter_ask_brand:
-    - text: "Do you have a specific brand in mind?"
+    - text: "Do you have a specific brand in mind, or would you like me to provide a recommendation right away?"
 
   utter_ask_registration_year:
-    - text: "What is the preferred registration year for the car you are looking for?"
+    - text: "What is the preferred registration year for the car you are looking for, or would you like me to provide a recommendation right away?"
 
   utter_ask_odometer_km:
-    - text: "What is the maximum mileage (in kilometers) you are willing to consider?"
-
+    - text: "What is the maximum mileage (in kilometers) you are willing to consider, or would you like me to provide a recommendation right away?"
 
 actions:
 - action_provide_recommendation
-
 
 session_config:
   session_expiration_time: 60

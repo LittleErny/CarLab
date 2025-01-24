@@ -58,5 +58,89 @@ stories:
     - intent: goodbye
     - action: utter_goodbye
 
+- story: User challange bot and provides information
+  steps:
+    - intent: bot_challenge
+    - action: utter_bot_challenge
+    - intent: provide_price
+      entities:
+        - price_EUR: 20000
 
-  
+    - action: utter_ask_vehicle_type
+    - intent: provide_vehicle_type
+      entities:
+        - vehicle_type: suv
+
+    - action: utter_ask_registration_year
+    - intent: provide_registration_year
+      entities:
+        - registration_year: 2018
+
+    - action: utter_ask_transmission
+    - intent: provide_transmission
+      entities:
+        - transmission: automatik
+
+    - action: utter_ask_power_ps
+    - intent: provide_power
+      entities:
+        - power_ps: 150
+
+    - action: utter_ask_odometer_km
+    - intent: provide_mileage
+      entities:
+        - odometer_km: 50000
+
+    - action: utter_ask_fuel_type
+    - intent: provide_fuel_type
+      entities:
+        - fuel_type: diesel
+
+    - action: utter_ask_brand
+    - intent: provide_brand
+      entities:
+        - brand: bmw
+
+    - intent: request_recommendation
+    - action: action_provide_recommendation
+
+- story: User start to provide data all by himself
+  steps:
+    - intent: provide_price
+      entities:
+        - price_EUR: 20000
+
+    - action: utter_ask_vehicle_type
+    - intent: provide_vehicle_type
+      entities:
+        - vehicle_type: suv
+
+    - action: utter_ask_registration_year
+    - intent: provide_registration_year
+      entities:
+        - registration_year: 2018
+
+    - action: utter_ask_transmission
+    - intent: provide_transmission
+      entities:
+        - transmission: automatik
+    - action: utter_ask_power_ps
+    - intent: request_recommendation
+    - action: action_provide_recommendation
+
+- story: Greeting and Basic Exit
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: goodbye
+    - action: utter_goodbye
+
+- story: Express Gratitude
+  steps:
+    - intent: thank_you
+    - action: utter_thank_you
+
+- story: Bot Identity Challenge
+  steps:
+    - intent: bot_challenge
+    - action: utter_bot_challenge
