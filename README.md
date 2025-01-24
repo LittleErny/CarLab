@@ -1,6 +1,6 @@
 Student 1: `Avrutskii, Mikhail`, `12306524`
 
-Student 2: `Safronov, Mikhail`, `Mat-No`
+Student 2: `Safronov, Mikhail`, `22305205`
 
 # CarLab
 
