@@ -1,94 +1,125 @@
-version: "3.1"
-
+version: '3.1'
 intents:
-  - greet
-  - goodbye
-  - affirm
-  - deny
-  - provide_details
-  - provide_budget
-  - request_car_advice
-  - inquire_about_features
-  - thank_you
+- bot_challenge
+- car_interested
+- goodbye
+- greet
+- thank_you
+- provide_price
+- provide_power
+- provide_vehicle_type
+- provide_transmission
+- provide_fuel_type
+- provide_brand
+- provide_registration_year
+- provide_mileage
+- request_recommendation
 
 entities:
-  - age
-  - income
-  - family_size
-  - budget
-  - car_type
-  - fuel_type
-  - requirements
-  - features
-  - car_use_case
+- power_ps
+- fuel_type
+- odometer_km
+- brand
+- price_EUR
+- vehicle_type
+- registration_year
+- transmission
 
 slots:
-  age:
-    type: text
-    influence_conversation: true
-    mappings:
-      - type: from_text
-  income:
-    type: text
-    influence_conversation: true
-    mappings:
-      - type: from_text
-  family_size:
-    type: text
-    influence_conversation: true
-    mappings:
-      - type: from_text
-  budget:
+  price_EUR:
     type: float
     influence_conversation: true
     mappings:
-      - type: from_text
-  car_type:
+    - type: from_entity
+      entity: price_EUR
+  vehicle_type:
     type: text
     influence_conversation: true
     mappings:
-      - type: from_text
+    - type: from_entity
+      entity: vehicle_type
+  registration_year:
+    type: float
+    influence_conversation: true
+    mappings:
+    - type: from_entity
+      entity: registration_year
+  transmission:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_entity
+      entity: transmission
+  power_ps:
+    type: float
+    influence_conversation: true
+    mappings:
+    - type: from_entity
+      entity: power_ps
+  odometer_km:
+    type: float
+    influence_conversation: true
+    mappings:
+    - type: from_entity
+      entity: odometer_km
   fuel_type:
     type: text
     influence_conversation: true
     mappings:
-      - type: from_text
-  requirements:
+    - type: from_entity
+      entity: fuel_type
+  brand:
     type: text
     influence_conversation: true
     mappings:
-      - type: from_text
-  features:
-    type: text
-    influence_conversation: true
-    mappings:
-      - type: from_text
-  car_use_case:
-    type: text
-    influence_conversation: true
-    mappings:
-      - type: from_text
+    - type: from_entity
+      entity: brand
 
 responses:
-  utter_greet:
-    - text: "Hello! I can help you find the perfect car. Could you share some details like your budget or requirements?"
-    - text: "Hi there! Ready to explore car options?"
+  utter_bot_challenge:
+    - text: "I am a RASA-based chatbot, here to help you find the perfect car!"
+
+  utter_car_interested:
+    - text: "Let's find the perfect car for you! What are your preferences?"
 
   utter_goodbye:
-    - text: "Goodbye! Feel free to reach out anytime."
-    - text: "Take care and let me know if you need more help!"
+    - text: "Goodbye! Have a great day!"
 
-  utter_ask_details:
-    - text: "Could you provide your age, family size, and income to get started?"
-
-  utter_ask_budget:
-    - text: "What is your budget for the car?"
-
-  utter_provide_car_advice:
-    - text: "Here are some cars that match your needs. Let me find them for you!"
+  utter_greet:
+    - text: "Hello! How can I assist you today?"
 
   utter_thank_you:
-    - text: "You're welcome! Let me know if there's anything else I can assist with."
+    - text: "You're welcome! Let me know if you need anything else."
+
+  utter_ask_price_EUR:
+    - text: "What is your budget in euros (EUR)?"
+
+  utter_ask_power_ps:
+    - text: "What is the horsepower (HP) you are looking for?"
+
+  utter_ask_vehicle_type:
+    - text: "What type of vehicle are you interested in? (e.g., cabrio, kleinwagen, SUV, kombi, limousine, coupe, bus, andere, Unknown)"
+
+  utter_ask_transmission:
+    - text: "What type of transmission do you prefer? (e.g., manual, automatic, Unknown)"
+
+  utter_ask_fuel_type:
+    - text: "What type of fuel are you looking for? (e.g., Unknown, petrol, diesel, LPG, other, CNG, hybrid, electric)"
+
+  utter_ask_brand:
+    - text: "Do you have a specific brand in mind?"
+
+  utter_ask_registration_year:
+    - text: "What is the preferred registration year for the car you are looking for?"
+
+  utter_ask_odometer_km:
+    - text: "What is the maximum mileage (in kilometers) you are willing to consider?"
+
 
 actions:
-  - action_provide_car_recommendation
+- action_provide_recommendation
+
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

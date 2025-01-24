@@ -1,62 +1,558 @@
 version: "3.1"
-
 nlu:
-- intent: greet
+- intent: bot_challenge
   examples: |
-    - hi
-    - hello
-    - hey
-    - good morning
-    - good evening
+    - are you a bot?
+    - are you a human?
+    - am I talking to a bot?
+    - am I talking to a human?
+    - is this a bot?
+    - are you real?
+    - are you a chatbot?
+    - am I chatting with a machine?
+    - who are you?
+    - what are you?
+    - are you a person?
+    - are you artificial?
+    - do you have feelings?
+    - how do you work?
+    - are you alive?
+    - is this an AI?
+    - can you think?
+    - are you intelligent?
+    - how smart are you?
+    - are you self-aware?
+    - can you pass the Turing test?
+    - are you controlled by someone?
+    - do you have emotions?
+    - are you programmed?
+    - is there a human behind this?
+    - how were you created?
+    - are you just a script?
+    - can you make decisions?
+    - do you understand me?
+    - are you listening to me?
+    - can you feel anything?
+    - how do you process information?
+    - are you smarter than a human?
+    - can you evolve?
+    - are you capable of learning?
+    - are you just an algorithm?
+    - what is your purpose?
+    - are you like Siri or Alexa?
+    - do you have a consciousness?
+    - do you know you’re a bot?
+    - are you capable of independent thought?
+    - do you know who I am?
+    - are you limited in your responses?
+    - are you talking to multiple people?
+    - how advanced are you?
+
+
+- intent: car_interested
+  examples: |
+    - I want to buy a car
+    - I am interested in buying a car
+    - What car can you recommend?
+    - I need a car
+    - I am looking for a car
+    - I want to purchase a car
+    - Can you help me find a car?
+    - I need advice on buying a car
+    - I need help finding a car
+    - I'm shopping for a car
+    - I want to get a new car
+    - I'm looking for car recommendations
+    - Help me find a car
+    - I want to own a car
+    - Can you assist with car selection?
+    - I need a vehicle
+    - Suggest a car for me
+    - I'm in the market for a car
+    - Help me choose a car
+    - Can you guide me to the right car?
+    - I'm interested in car options
+    - I want to explore car models
+    - Find me a suitable car
+    - I need suggestions for a car
+    - I want to buy a vehicle
+    - I'm searching for a car
+    - Do you have car recommendations?
+    - I'm thinking of buying a car
+    - I need help deciding on a car
+    - I’d like to know which car suits me
+    - Can you recommend a vehicle for me?
+    - What’s the best car for my needs?
+    - I’m considering purchasing a car
+    - Can you find a car for me?
+    - I want information about cars
+    - I want to browse car options
+    - I’m planning to buy a car
+    - What car fits my requirements?
+    - Could you help me pick a car?
+    - I’d like to find the right car
+    - Can you show me some cars?
+    - I want to choose a car
+    - Help me select a vehicle
 
 - intent: goodbye
   examples: |
+    - cu
+    - good bye
+    - see you later
     - bye
     - goodbye
-    - see you later
+    - have a nice day
+    - see you around
+    - bye bye
     - take care
+    - see ya
+    - I am leaving
+    - I need to go
+    - talk to you later
+    - catch you later
+    - see you soon
+    - farewell
+    - so long
+    - bye for now
+    - see you next time
+    - have a good one
+    - take it easy
+    - until next time
+    - later
+    - gotta go
+    - I’ll talk to you soon
+    - peace out
+    - I’m off
+    - see you in a bit
+    - all the best
+    - have a great day
+    - talk soon
+    - I’ll catch you later
+    - later, friend
+    - see you tomorrow
+    - bye, take care
+    - cheers, goodbye
+    - I’m signing off
 
-- intent: affirm
+- intent: greet
   examples: |
-    - yes
-    - indeed
-    - correct
-    - absolutely
-
-- intent: deny
-  examples: |
-    - no
-    - not really
-    - I don't think so
-
-- intent: provide_details
-  examples: |
-    - I am 30 years old with a family of 4.
-    - My income is 3000 euros per month.
-    - I have a family of 2 and earn 4500 monthly.
-    - I'm 25, single, and looking for a car for work.
-
-- intent: provide_budget
-  examples: |
-    - My budget is 15000 euros.
-    - I can spend up to 20000.
-    - I'm looking for cars under 5000 euros.
-
-- intent: request_car_advice
-  examples: |
-    - Can you suggest a car for me?
-    - What car would you recommend?
-    - Please help me choose a car.
-
-- intent: inquire_about_features
-  examples: |
-    - I need a car with good mileage.
-    - It should be an electric car.
-    - I want something family-friendly with 7 seats.
+    - hey
+    - hello
+    - hi
+    - hello there
+    - good morning
+    - good evening
+    - good afternoon
+    - moin
+    - hey there
+    - let's go
+    - hey dude
+    - goodmorning
+    - goodevening
+    - hi there
+    - greetings
+    - hello, how are you?
+    - hi there, how's it going?
+    - hey, what's up?
+    - Helllo
+    - what's good?
+    - yo
+    - what's up?
+    - howdy
+    - how's it going?
+    - how are you?
+    - hi everyone
+    - hey friend
+    - hello world
+    - good day
+    - sup
+    - hey pal
+    - hello again
+    - hi, nice to meet you
+    - good to see you
 
 - intent: thank_you
   examples: |
-    - Thanks
-    - Thank you
-    - Appreciate it
-    - Much obliged
+    - thank you
+    - thanks
+    - thx
+    - appreciate it
+    - much appreciated
+    - thanks a lot
+    - thank you so much
+    - wonderful, thanks
+    - thanks for the info
+    - cheers
+    - many thanks
+    - I appreciate it
+    - thanks a bunch
+    - thanks a ton
+    - you're the best
+    - thanks for your help
+    - I owe you one
+    - I’m grateful
+    - thank you kindly
+    - you’ve been a great help
+    - I can’t thank you enough
+    - thanks for everything
+    - endless thanks
+    - big thanks
+    - super, thanks
+    - cool, thanks
+    - really appreciate it
+
+- intent: provide_price
+  examples: |
+    - My budget is around [20000](price_EUR)
+    - I can spend between [15000](price_EUR) and [25000](price_EUR)
+    - I'm looking for something under [30000](price_EUR)
+    - The car should cost no more than [18000](price_EUR)
+    - I need something affordable, around [10000](price_EUR)
+    - My budget is flexible up to [40000](price_EUR)
+    - I prefer cars within the range of [12000](price_EUR) to [20000](price_EUR)
+    - Can you find a car priced at [25000](price_EUR)?
+    - My maximum price is [50000](price_EUR)
+    - I want to stay below [35000](price_EUR)
+    - I have about [15000](price_EUR) for a car
+    - Can you find something close to [22000](price_EUR)?
+    - I’d like to spend around [30000](price_EUR)
+    - I need a car that costs less than [25000](price_EUR)
+    - My budget range is between [20000](price_EUR) and [30000](price_EUR)
+    - The car shouldn't exceed [10000](price_EUR)
+    - I’m interested in vehicles in the [15000](price_EUR) range
+    - Show me cars around [18000](price_EUR)
+    - Find a car priced up to [40000](price_EUR)
+
+- intent: provide_power
+  examples: |
+    - I need a car with [100](power_ps) hp
+    - I want a car with [150](power_ps) hp
+    - A car with [200](power_ps) hp would be perfect
+    - Find me a car with [250](power_ps) horsepower
+    - I’m looking for a car with [300](power_ps) hp
+    - Show me cars with [180](power_ps) horsepower
+    - I want something with [120](power_ps) hp
+    - The car should have [140](power_ps) horsepower
+    - I’d prefer a car with [220](power_ps) hp
+    - I like vehicles with [250](power_ps) hp
+    - A vehicle with [320](power_ps) horsepower would be great
+    - I prefer cars with [200](power_ps) hp
+    - Find me something with [280](power_ps) hp
+    - I’m interested in a car with [360](power_ps) horsepower
+    - My ideal car has [400](power_ps) hp
+    - A car with [450](power_ps) hp would suit me
+    - Show me vehicles with exactly [500](power_ps) hp
+    - I need a car with at least [110](power_ps) hp
+    - I want something powerful, like [550](power_ps) horsepower
+    - Find me a car with [600](power_ps)
+    - My preference is [150](power_ps) hp
+    - I’d like to see cars with [275](power_ps) hp
+    - Can you find something with [200](power_ps) horsepower?
+    - Show me cars with [230](power_ps) hp
+    - I need a car with [310](power_ps) hp
+    - The vehicle should have [340](power_ps) hp
+    - I want something with [420](power_ps) horsepower
+    - A car with [120](power_ps) hp is fine
+    - Find me a car with [200](power_ps) hp
+    - Show me cars with [500](power_ps) horsepower
+    - I want a car with [90](power_ps) hp
+    - I’d like a vehicle with [95](power_ps) hp
+    - A car with [125](power_ps) hp would be ideal
+    - My car should have [150](power_ps) horsepower
+    - Find something with [180](power_ps) hp
+    - I need a car with [75](power_ps) hp
+    - Show me cars with [300](power_ps)
+    - Find me vehicles with [350](power_ps) hp
+    - I need something with [100](power_ps) horsepower
+    - My ideal vehicle has [450](power_ps) hp
+    - A car with [220](power_ps) hp works for me
+    - Show me options with [90](power_ps) horsepower
+    - I want a vehicle with [330](power_ps) hp
+    - Can you find cars with [400](power_ps)?
+    - My preference is for [600](power_ps) hp
+    - Find me a car with [275](power_ps)
+    - A car with [300](power_ps) horsepower would be great
+   
+- intent: provide_vehicle_type
+  examples: |
+    - I want a [cabrio](vehicle_type)
+    - I am looking for a [cabrio](vehicle_type)
+    - A [cabrio](vehicle_type) would be great
+    - Do you have a [cabrio](vehicle_type)?
+    - I need a [cabrio](vehicle_type)
+    - My choice is a [cabrio](vehicle_type)
+    - I prefer a [kleinwagen](vehicle_type)
+    - I want a [kleinwagen](vehicle_type)
+    - A [kleinwagen](vehicle_type) would work
+    - Show me options for [kleinwagen](vehicle_type)
+    - I am looking for a [kleinwagen](vehicle_type)
+    - A [kleinwagen](vehicle_type) is perfect for me
+    - I need an [suv](vehicle_type)
+    - I prefer an [suv](vehicle_type)
+    - Can you find me an [suv](vehicle_type)?
+    - I like [suv](vehicle_type)
+    - My choice is an [suv](vehicle_type)
+    - An [suv](vehicle_type) would be ideal
+    - I want a [kombi](vehicle_type)
+    - Show me [kombi](vehicle_type) options
+    - I prefer a [kombi](vehicle_type)
+    - A [kombi](vehicle_type) fits my needs
+    - I am searching for a [kombi](vehicle_type)
+    - Can I see options for a [kombi](vehicle_type)?
+    - I need a [limousine](vehicle_type)
+    - My preference is a [limousine](vehicle_type)
+    - A [limousine](vehicle_type) would be nice
+    - Do you have a [limousine](vehicle_type)?
+    - I want a luxurious [limousine](vehicle_type)
+    - Find me a [limousine](vehicle_type)
+    - I want a [coupe](vehicle_type)
+    - My favorite is a [coupe](vehicle_type)
+    - I am interested in a [coupe](vehicle_type)
+    - I am searching for a [coupe](vehicle_type)
+    - Show me [coupe](vehicle_type) models
+    - Do you have any [coupe](vehicle_type) cars?
+    - I prefer a [bus](vehicle_type)
+    - A [bus](vehicle_type) would work for me
+    - I need a spacious [bus](vehicle_type)
+    - Can I see options for a [bus](vehicle_type)?
+    - Do you have any [bus](vehicle_type) vehicles?
+    - A [bus](vehicle_type) is my preference
+    - Maybe something [andere](vehicle_type)?
+    - I prefer an [andere](vehicle_type) type
+    - Show me some [andere](vehicle_type) options
+    - Do you have an [andere](vehicle_type)?
+    - I need to explore [Unknown](vehicle_type) options
+    - Can you suggest some [Unknown](vehicle_type)?
+    - I am unsure, perhaps [Unknown](vehicle_type)
+    - Something [Unknown](vehicle_type) might work for me
+    - What about [Unknown](vehicle_type)?
+
+- intent: provide_transmission
+  examples: |
+    - I want a [manuell](transmission) transmission
+    - I need a [manuell](transmission) gearbox
+    - Can you find me a car with [manuell](transmission)?
+    - I prefer a car with [manuell](transmission)
+    - Show me [manuell](transmission) options
+    - I like cars with [manuell](transmission)
+    - A [manuell](transmission) car is what I need
+    - Do you have [manuell](transmission) vehicles?
+    - I am searching for a car with [manuell](transmission)
+    - It should have a [manuell](transmission)
+    - I prefer driving with [manuell](transmission)
+    - Find me a car with [manuell](transmission), please
+    - [Manuell](transmission) is my preference
+    - I need an [automatik](transmission) transmission
+    - Show me cars with [automatik](transmission)
+    - I want a car that is [automatik](transmission)
+    - Can you find [automatik](transmission) vehicles?
+    - I prefer an [automatik](transmission)
+    - [Automatik](transmission) is what I need
+    - I like cars with [automatik](transmission)
+    - Make sure it has [automatik](transmission)
+    - A car with [automatik](transmission) would be nice
+    - My choice is [automatik](transmission)
+    - Show me [automatik](transmission) models
+    - Find me a vehicle with [automatik](transmission)
+    - I prefer [automatik](transmission) for convenience
+    - I am not sure, maybe [Unknown](transmission)
+    - Perhaps something [Unknown](transmission)?
+    - Can you suggest cars with [Unknown](transmission)?
+    - I don't have a preference, maybe [Unknown](transmission)
+    - I need to see options with [Unknown](transmission)
+    - Could be [Unknown](transmission), I am open to options
+    - Something [Unknown](transmission) is okay
+    - Do you have [Unknown](transmission) vehicles?
+    - [Unknown](transmission) could work for me
+    - I have no preference, [Unknown](transmission) is fine
+
+- intent: provide_fuel_type
+  examples: |
+    - I want a [benzin](fuel_type) car
+    - I am looking for a [benzin](fuel_type) vehicle
+    - A [benzin](fuel_type) engine is what I need
+    - Show me options for [benzin](fuel_type)
+    - Do you have any [benzin](fuel_type) cars?
+    - I like [benzin](fuel_type) vehicles
+    - My preference is [benzin](fuel_type)
+    - Find me a [benzin](fuel_type) car
+    - I prefer [benzin](fuel_type) over others
+    - I want a [diesel](fuel_type) car
+    - A [diesel](fuel_type) engine is my choice
+    - Show me [diesel](fuel_type) options
+    - Do you have [diesel](fuel_type) vehicles?
+    - I need a [diesel](fuel_type) vehicle
+    - I prefer [diesel](fuel_type) for efficiency
+    - Can you find [diesel](fuel_type) cars for me?
+    - I like [diesel](fuel_type) engines
+    - My choice is [diesel](fuel_type)
+    - I need a [lpg](fuel_type) vehicle
+    - A [lpg](fuel_type) engine is what I prefer
+    - Do you have any [lpg](fuel_type) cars?
+    - Show me options with [lpg](fuel_type)
+    - I want a car that runs on [lpg](fuel_type)
+    - I like [lpg](fuel_type) vehicles
+    - Find me a [lpg](fuel_type) car
+    - I am searching for a [cng](fuel_type) car
+    - Do you have any [cng](fuel_type) options?
+    - I prefer [cng](fuel_type) over other types
+    - A [cng](fuel_type) car would be great
+    - Show me [cng](fuel_type) vehicles
+    - Find me a [cng](fuel_type) model
+    - I am looking for a [hybrid](fuel_type) car
+    - A [hybrid](fuel_type) engine is ideal
+    - Do you have any [hybrid](fuel_type) options?
+    - I want a [hybrid](fuel_type) vehicle
+    - Show me [hybrid](fuel_type) cars
+    - I like [hybrid](fuel_type) vehicles
+    - A [hybrid](fuel_type) is my preference
+    - I want an [elektro](fuel_type) car
+    - A [elektro](fuel_type) vehicle would be great
+    - Show me [elektro](fuel_type) options
+    - I need an [elektro](fuel_type) vehicle
+    - Do you have any [elektro](fuel_type) models?
+    - I prefer [elektro](fuel_type) over others
+    - [Elektro](fuel_type) cars are my choice
+    - I want something [andere](fuel_type)
+    - Show me [andere](fuel_type) vehicles
+    - Can you find [andere](fuel_type) options for me?
+    - I am looking for [andere](fuel_type) cars
+    - My preference is [andere](fuel_type)
+    - Perhaps something [andere](fuel_type)?
+    - Show me [Unknown](fuel_type) cars
+    - Do you have any [Unknown](fuel_type) options?
+    - I am open to [Unknown](fuel_type) vehicles
+    - Can you find cars with [Unknown](fuel_type)?
+    - Something [Unknown](fuel_type) could work for me
+
+- intent: provide_brand
+  examples: |
+    - I want an [Opel](brand)
+    - I am looking for a [Fiat](brand)
+    - A [Volvo](brand) would be great
+    - Show me cars from [Ford](brand)
+    - I prefer [Audi](brand) vehicles
+    - Find me a [BMW](brand) car
+    - I am interested in [Sonstige Autos](brand)
+    - Show me cars from [Volkswagen](brand)
+    - Do you have any [Hyundai](brand) models?
+    - I like [Mercedes-Benz](brand)
+    - I need a [Renault](brand)
+    - A [Peugeot](brand) vehicle is my choice
+    - Show me [Skoda](brand) cars
+    - I prefer a [Toyota](brand)
+    - Do you have any [Citroen](brand) options?
+    - I want a [Dacia](brand) car
+    - A [Mazda](brand) would be ideal
+    - Show me [Mitsubishi](brand) models
+    - I am interested in [Seat](brand) vehicles
+    - Find me a [Smart](brand) car
+    - I like [Alfa Romeo](brand)
+    - Show me [Mini](brand) cars
+    - Do you have any [Chrysler](brand) vehicles?
+    - I am searching for a [Subaru](brand)
+    - A [Nissan](brand) car is what I need
+    - Find me a [Jeep](brand)
+    - I want a car from [Honda](brand)
+    - Show me [Porsche](brand) options
+    - I am interested in [Kia](brand) vehicles
+    - Can you find [Chevrolet](brand) cars?
+    - I like the [Trabant](brand)
+    - A [Lancia](brand) is my choice
+    - Do you have any [Saab](brand) models?
+    - Show me [Daihatsu](brand) cars
+    - I prefer [Suzuki](brand) vehicles
+    - Find me a [Land Rover](brand)
+    - I like [Jaguar](brand) cars
+    - A [Daewoo](brand) car would work
+    - I need a car from [Rover](brand)
+    - I am looking for a [Lada](brand)
+    - Do you have any [Ford](brand) cars?
+    - I am interested in [Audi](brand) options
+    - [BMW](brand) is my favorite
+    - I want something from [Volkswagen](brand)
+    - Show me cars by [Toyota](brand)
+    - I prefer [Mercedes-Benz](brand)
+    - Can you find [Kia](brand) vehicles for me?
+    - I like [Chevrolet](brand) models
+    - A [Subaru](brand) is my ideal choice
+    - [Jeep](brand) cars are my preference
+    - Show me [Hyundai](brand) options
+    - Find me a car from [Renault](brand)
+    - I am interested in [Peugeot](brand)
+    - Do you have any [Citroen](brand) options?
+    - [Mazda](brand) cars are what I need
+    - I prefer [Skoda](brand) vehicles
+    - [Alfa Romeo](brand) cars are my choice
+    - Find me a [Mini](brand) car
+    - Show me [Chrysler](brand) options
+    - I like [Porsche](brand) models
+    - Do you have any [Jaguar](brand) vehicles?
+    - Show me options for [Land Rover](brand)
+
+- intent: provide_registration_year
+  examples: |
+    - Car should be registered in [2003](registration_year)
+    - Find me a car from [2011](registration_year)
+    - I want a car newer than [2016](registration_year)
+    - Show cars registered after [2014](registration_year)
+    - Cars from [2009](registration_year) or later are fine
+    - I prefer vehicles registered before [2020](registration_year)
+    - Can you find me something registered in [2012](registration_year)?
+    - The vehicle should not be older than [2017](registration_year)
+    - Find a car registered in the last [10 years](registration_year)
+    - A model from [2023](registration_year) would be perfect
+    - Nothing earlier than [2007](registration_year)
+    - Show cars registered exactly in [2015](registration_year)
+    - I am interested in a car from [2019](registration_year) or later
+    - I need a vehicle not older than [2013](registration_year)
+    - Cars from [2018](registration_year) or newer are ideal
+    - It should be registered before [2021](registration_year)
+    - Anything registered in [2005](registration_year) would work
+    - Cars made after [2000](registration_year) are my preference
+    - Vehicles newer than [2011](registration_year) are fine
+
+- intent: provide_mileage
+  examples: |
+    - I want a car with less than [20000](odometer_km) km on it
+    - The mileage should be under [5000](odometer_km) km
+    - A car with low mileage, like [25000](odometer_km), is ideal
+    - Keep the mileage below [6000](odometer_km)
+    - I am looking for a car driven less than [1000](odometer_km) km
+    - I need a vehicle with under [3000](odometer_km) km
+    - The car should have no more than [20000](odometer_km) km
+    - I want a car with fewer than [45000](odometer_km) km
+    - Mileage should not exceed [15000](odometer_km)
+    - Keep the mileage below [35000](odometer_km)
+    - A vehicle with only [100](odometer_km) km would be perfect
+    - Can you find cars with less than [5000](odometer_km) mileage?
+    - It should have minimal mileage, ideally [40000](odometer_km)
+    - Cars with mileage below [55000](odometer_km) work for me
+    - I prefer mileage around [70000](odometer_km)
+    - Anything with mileage under [2000](odometer_km) is fine
+    - A car driven less than [30000](odometer_km) is ideal
+    - I want something with less than [15000](odometer_km)
+ 
+- intent: request_recommendation
+  examples: |
+    - Based on my preferences, what car should I buy?
+    - Based on my inputs, which car would you recommend?
+    - Can you suggest a car that matches my criteria?
+    - What’s the best car for me based on the information I provided?
+    - Recommend a car within my stated budget
+    - Considering my preferences, which car should I choose?
+    - Can you help me finalize a car choice?
+    - What car fits my needs based on the data I gave?
+    - Suggest a car that meets my requirements
+    - Based on my criteria, what’s the top recommendation?
+    - What’s the ideal car for my preferences?
+    - Can you recommend a car based on my specifications?
+    - Given my needs, which car is the best choice?
+    - What car should I buy given my inputs?
+    - Which car do you think suits me best?
+    - Show me the best car for my requirements
+    - Recommend the most suitable car for my budget and needs
+    - Based on my preferences, which car is a good match?
+    - Help me finalize the best option for a car
+    - Which car aligns best with my preferences?

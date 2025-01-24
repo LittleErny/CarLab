@@ -1,111 +1,108 @@
+import pandas as pd
+import re
 from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
-import pandas as pd
-import re
-import kagglehub
+from rasa_sdk.types import DomainDict
+from kagglehub import dataset_download
 
-# Download latest version of the dataset
-path = kagglehub.dataset_download("shaunoilund/auto-sales-ebay-germany-random-50k-cleaned")
+# Load dataset from Kaggle
+path = dataset_download("shaunoilund/auto-sales-ebay-germany-random-50k-cleaned")
 data_path = f"{path}/autos_random_50k_cleaned.csv"
 try:
-    car_data = pd.read_csv(data_path)
+    data = pd.read_csv(data_path)
 except FileNotFoundError:
-    car_data = None
+    data = None
 
-class ActionProvideCarRecommendation(Action):
+# Unique values for categorical fields
+unique_vehicle_types = ["cabrio", "kleinwagen", "suv", "kombi", "limousine", "coupe", "bus", "andere", "unknown"]
+unique_transmissions = ["manuell", "automatik", "unknown"]
+unique_fuel_types = ["unknown", "benzin", "diesel", "lpg", "andere", "cng", "hybrid", "elektro"]
+unique_brands = [
+    "opel", "fiat", "volvo", "ford", "audi", "bmw", "sonstige_autos", "volkswagen", "hyundai",
+    "mercedes_benz", "renault", "peugeot", "skoda", "toyota", "citroen", "dacia", "mazda", "mitsubishi",
+    "seat", "smart", "alfa_romeo", "mini", "chrysler", "subaru", "nissan", "jeep", "honda", "porsche", "kia",
+    "chevrolet", "trabant", "lancia", "saab", "daihatsu", "suzuki", "land_rover", "jaguar", "daewoo", "rover",
+    "lada"
+]
+
+def extract_text_from_message(message: str, valid_values: List[str]) -> str:
+    """
+    Extracts the first matching value from the list of valid values in the message.
+    """
+    for value in valid_values:
+        if value.lower() in message.lower():
+            return value
+    return None
+
+def filter_data(filters: Dict[Text, Any]) -> pd.DataFrame:
+    """
+    Filters the dataset based on the provided filters.
+    """
+    if data is None:
+        return pd.DataFrame()
+
+    filtered_data = data.copy()
+    for key, value in filters.items():
+        if value is not None:
+            # Handle numeric filters
+            if key in ["price_EUR", "registration_year", "power_ps", "odometer_km"]:
+                try:
+                    numeric_value = float(value)  # Convert to float
+                    filtered_data = filtered_data[
+                        (filtered_data[key] >= numeric_value * 0.9) & (filtered_data[key] <= numeric_value * 1.1)
+                    ]
+                except ValueError:
+                    # Skip this filter if conversion fails
+                    continue
+            # Handle categorical filters
+            elif isinstance(value, str):
+                filtered_data = filtered_data[filtered_data[key].str.lower() == value.lower()]
+    return filtered_data
+
+
+class ActionProvideRecommendation(Action):
 
     def name(self) -> Text:
-        return "action_provide_car_recommendation"
+        return "action_provide_recommendation"
 
-    def run(
-        self,
-        dispatcher: CollectingDispatcher,
-        tracker: Tracker,
-        domain: Dict[Text, Any],
-    ) -> List[Dict[Text, Any]]:
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
+        # Extract user message
+        user_message = tracker.latest_message.get("text", "")
 
-        if car_data is None:
-            dispatcher.utter_message(text="The car dataset could not be loaded. Please ensure the dataset file is available.")
-            return []
+        # Extract and validate slot values
+        filters = {
+            "price_EUR": tracker.get_slot("price_EUR"),
+            "registration_year": tracker.get_slot("registration_year"),
+            "power_ps": tracker.get_slot("power_ps"),
+            "odometer_km": tracker.get_slot("odometer_km"),
+            "vehicle_type": extract_text_from_message(user_message, unique_vehicle_types),
+            "transmission": extract_text_from_message(user_message, unique_transmissions),
+            "fuel_type": extract_text_from_message(user_message, unique_fuel_types),
+            "brand": extract_text_from_message(user_message, unique_brands),
+        }
 
-        # Extract user data from slots
-        budget = tracker.get_slot("budget")
-        requirements = tracker.get_slot("requirements")
-        fuel_type = tracker.get_slot("fuel_type")
-        car_type = tracker.get_slot("car_type")
+        # Filter the data
+        filtered_data = filter_data(filters)
 
-        # Debug: Log the raw slot values
-        dispatcher.utter_message(text=f"DEBUG: Received budget slot value: {budget}")
-        dispatcher.utter_message(text=f"DEBUG: Received fuel_type slot value: {fuel_type}")
-        dispatcher.utter_message(text=f"DEBUG: Received requirements slot value: {requirements}")
-
-        # Validate and clean budget
-        try:
-            if not budget:
-                raise ValueError("Budget slot is empty or not set.")
-            # Extract numbers from the budget slot
-            extracted_budget = re.findall(r"[0-9]+(?:\\.[0-9]+)?", str(budget))
-            if not extracted_budget:
-                raise ValueError("No numeric value found in the budget slot.")
-            budget = float(extracted_budget[0])
-        except (ValueError, TypeError) as e:
-            dispatcher.utter_message(text=f"DEBUG: Budget validation error: {e}")
-            dispatcher.utter_message(text=f"Your budget value '{budget}' is not valid. Please provide a numeric value.")
-            return []
-
-        # Debug: Log the cleaned budget
-        dispatcher.utter_message(text=f"DEBUG: Cleaned budget value: {budget}")
-
-        # Normalize inputs
-        if fuel_type:
-            fuel_type = fuel_type.lower().strip()
-            if fuel_type not in ['unknown', 'benzin', 'diesel', 'lpg', 'andere', 'cng', 'hybrid', 'elektro']:
-                dispatcher.utter_message(text=f"The fuel type '{fuel_type}' is not recognized. Please choose from: benzin, diesel, lpg, cng, hybrid, elektro, or andere.")
-                return []
-        if requirements:
-            requirements = requirements.lower().strip()
-            if requirements not in ['cabrio', 'kleinwagen', 'suv', 'kombi', 'limousine', 'coupe', 'bus', 'andere']:
-                dispatcher.utter_message(text=f"The vehicle type '{requirements}' is not recognized. Please choose from: cabrio, kleinwagen, suv, kombi, limousine, coupe, bus, or andere.")
-                return []
-        if car_type:
-            car_type = car_type.lower().strip()
-
-        # Filter dataset
-        filtered_cars = car_data[(car_data["price_EUR"] <= budget)]
-        dispatcher.utter_message(text=f"DEBUG: Cars after budget filter: {len(filtered_cars)}")
-
-        if requirements:
-            filtered_cars = filtered_cars[
-                filtered_cars["vehicle_type"].str.lower().str.contains(requirements, na=False)
-            ]
-            dispatcher.utter_message(text=f"DEBUG: Cars after requirements filter: {len(filtered_cars)}")
-
-        if fuel_type and len(filtered_cars) > 0:
-            filtered_cars = filtered_cars[
-                filtered_cars["fuel_type"].str.lower().str.contains(fuel_type, na=False)
-            ]
-            dispatcher.utter_message(text=f"DEBUG: Cars after fuel type filter: {len(filtered_cars)}")
-
-        if car_type and len(filtered_cars) > 0:
-            filtered_cars = filtered_cars[
-                filtered_cars["vehicle_type"].str.lower().str.contains(car_type, na=False)
-            ]
-            dispatcher.utter_message(text=f"DEBUG: Cars after car type filter: {len(filtered_cars)}")
-
-        # Handle no matches
-        if filtered_cars.empty:
-            dispatcher.utter_message(
-                text="I couldn't find any exact matches. Let me show you some popular options within your budget."
+        if filtered_data.empty:
+            dispatcher.utter_message(text="Unfortunately, I couldn't find any cars matching your criteria.")
+        else:
+            # Select the top 3 most popular cars
+            top_cars = (
+                filtered_data
+                .groupby(["brand", "model"])
+                .size()
+                .reset_index(name="popularity")
+                .sort_values(by="popularity", ascending=False)
+                .head(3)
             )
-            filtered_cars = car_data[(car_data["price_EUR"] <= budget)].nsmallest(3, "price_EUR")
 
-        # Generate response
-        response = "Here are some cars that match your requirements:\n"
-        for _, car in filtered_cars.iterrows():
-            response += (
-                f"- {car['brand']} {car['model']} ({car['registration_year']}): {car['price_EUR']} EUR, {car['fuel_type']}\n"
-            )
-        dispatcher.utter_message(text=response)
+            # Create the response
+            response = "Here are the top 3 most popular cars based on your criteria:\n"
+            for index, row in top_cars.iterrows():
+                response += f"- {row['brand']} {row['model']} (popularity: {row['popularity']})\n"
+
+            dispatcher.utter_message(text=response)
 
         return []

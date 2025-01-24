@@ -1,33 +1,62 @@
 version: "3.1"
 
 stories:
-- story: User greets and provides details
+- story: User greets and gets car recommendation
   steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: provide_details
-  - action: utter_ask_budget
+    - intent: greet
+    - action: utter_greet
 
-- story: User provides budget
-  steps:
-  - intent: provide_budget
-  - action: action_provide_car_recommendation
+    - intent: car_interested
+    - action: utter_car_interested
 
-- story: User requests car advice directly
-  steps:
-  - intent: request_car_advice
-  - action: utter_ask_details
-  - intent: provide_details
-  - action: utter_ask_budget
-  - intent: provide_budget
-  - action: action_provide_car_recommendation
+    - action: utter_ask_price_EUR
+    - intent: provide_price
+      entities:
+        - price_EUR: 20000
 
-- story: User says thank you
-  steps:
-  - intent: thank_you
-  - action: utter_thank_you
+    - action: utter_ask_vehicle_type
+    - intent: provide_vehicle_type
+      entities:
+        - vehicle_type: suv
 
-- story: User says goodbye
-  steps:
-  - intent: goodbye
-  - action: utter_goodbye
+    - action: utter_ask_registration_year
+    - intent: provide_registration_year
+      entities:
+        - registration_year: 2018
+
+    - action: utter_ask_transmission
+    - intent: provide_transmission
+      entities:
+        - transmission: automatik
+
+    - action: utter_ask_power_ps
+    - intent: provide_power
+      entities:
+        - power_ps: 150
+
+    - action: utter_ask_odometer_km
+    - intent: provide_mileage
+      entities:
+        - odometer_km: 50000
+
+    - action: utter_ask_fuel_type
+    - intent: provide_fuel_type
+      entities:
+        - fuel_type: diesel
+
+    - action: utter_ask_brand
+    - intent: provide_brand
+      entities:
+        - brand: bmw
+
+    - intent: request_recommendation
+    - action: action_provide_recommendation
+
+    - intent: thank_you
+    - action: utter_thank_you
+
+    - intent: goodbye
+    - action: utter_goodbye
+
+
+  
