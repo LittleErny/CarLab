@@ -556,3 +556,232 @@ nlu:
     - Based on my preferences, which car is a good match?
     - Help me finalize the best option for a car
     - Which car aligns best with my preferences?
+
+- intent: ask_about_app_overview
+  examples: |
+    - What does this app do?
+    - Can you explain the CarLab app?
+    - Tell me about the CarLab project.
+    - What is this app about?
+    - Briefly describe the CarLab app.
+    - How does this app work?
+    - What features does this app have?
+    - Give me an overview of the app.
+    - What can I do in this app?
+    - Tell me about the app's features.
+    - What pages does this app include?
+    - Explain the app functionality.
+    - Can you describe the app's purpose?
+    - What's the purpose of the CarLab project?
+    - How is this app structured?
+    - Can you summarize the app?
+    - What does the app offer?
+    - What's included in this app?
+    - Can you tell me the app's main features?
+    - What does the CarLab app provide?
+
+- intent: ask_about_hello_page
+  examples: |
+    - What is the Hello Page?
+    - Tell me about the Hello Page.
+    - What's on the starting page?
+    - Explain the Hello Page.
+    - What's the purpose of the Hello Page?
+    - What do I do on the Hello Page?
+    - What's included in the Hello Page?
+    - Can you describe the Hello Page?
+    - What's the starting point in the app?
+    - How do I begin in the app?
+    - Where do I start in the app?
+    - What happens on the Hello Page?
+    - What information is on the Hello Page?
+    - What features are in the Hello Page?
+    - What's the overview page?
+    - Can you explain the starting page?
+    - What's the introduction page?
+    - How do I navigate the Hello Page?
+    - What's the role of the Hello Page?
+    - What do I see first in the app?
+
+- intent: ask_about_dataset_page
+  examples: |
+    - What is the Dataset Page?
+    - Tell me about the Dataset Page.
+    - What's on the Dataset Page?
+    - Explain the Dataset Page.
+    - What's the purpose of the Dataset Page?
+    - What do I do on the Dataset Page?
+    - What's included in the Dataset Page?
+    - Can you describe the Dataset Page?
+    - How do I explore the dataset?
+    - What data can I find in the app?
+    - How is the dataset presented?
+    - What's the dataset overview?
+    - How do I access the dataset?
+    - Where can I see dataset details?
+    - What's included in the dataset overview?
+    - How do I download the dataset?
+    - Can I view the dataset structure?
+    - What information is on the Dataset Page?
+    - How does the Dataset Page work?
+    - What's the dataset page for?
+
+- intent: ask_about_parameters_visualisation_page
+  examples: |
+    - What is the Parameters Visualisation Page?
+    - Tell me about the Parameters Visualisation Page.
+    - What's on the Parameters Visualisation Page?
+    - Explain the Parameters Visualisation Page.
+    - What's the purpose of the Parameters Visualisation Page?
+    - What do I do on the Parameters Visualisation Page?
+    - What's included in the Parameters Visualisation Page?
+    - Can you describe the Parameters Visualisation Page?
+    - How do I visualize data parameters?
+    - How can I create charts in the app?
+    - What tools are available for data visualization?
+    - How do I use the Parameters Visualisation Page?
+    - What's the charting page?
+    - How do I edit visualizations?
+    - What's the role of Markdown boxes?
+    - Can I save my visualizations?
+    - How do I analyze correlations in the app?
+    - What's the purpose of the charts?
+    - Where can I find data analysis tools?
+    - How does the Parameters Visualisation Page help?
+
+- intent: ask_about_preprocessings_page
+  examples: |
+    - What is the Preprocessings Page?
+    - Tell me about the Preprocessings Page.
+    - What's on the Preprocessings Page?
+    - Explain the Preprocessings Page.
+    - What's the purpose of the Preprocessings Page?
+    - What do I do on the Preprocessings Page?
+    - What's included in the Preprocessings Page?
+    - Can you describe the Preprocessings Page?
+    - How do I preprocess data in the app?
+    - What preprocessing actions are available?
+    - How do I remove outliers?
+    - What's the role of label encoding?
+    - How does scaling work in the app?
+    - How do I prepare data for modeling?
+    - What's the purpose of preprocessing actions?
+    - Can I see the effects of preprocessing?
+    - How do preprocessing actions affect the dataset?
+    - What's the importance of preprocessing?
+    - How does preprocessing improve modeling?
+    - Where can I prepare the dataset for analysis?
+
+- intent: ask_about_faker_page
+  examples: |
+    - What is the Faker Page?
+    - Tell me about the Faker Page.
+    - What's on the Faker Page?
+    - Explain the Faker Page.
+    - What's the purpose of the Faker Page?
+    - What do I do on the Faker Page?
+    - What's included in the Faker Page?
+    - Can you describe the Faker Page?
+    - How do I generate synthetic data?
+    - What's the role of the Faker Page?
+    - What methods are available for data generation?
+    - How do I add fake data to the dataset?
+    - What's the purpose of synthetic data?
+    - How do I control data ranges in the app?
+    - What's the difference between Random and Proportional generation?
+    - Can I test my dataset with fake data?
+    - How does the Faker Page affect preprocessing?
+    - Why should I generate fake data?
+    - What's the impact of synthetic data on analysis?
+    - Where do I expand my dataset?
+
+- intent: ask_about_model_page
+  examples: |
+    - What is the Model Page?
+    - Tell me about the Model Page.
+    - What's on the Model Page?
+    - Explain the Model Page.
+    - What's the purpose of the Model Page?
+    - What do I do on the Model Page?
+    - What's included in the Model Page?
+    - Can you describe the Model Page?
+    - How do I train models in the app?
+    - What models can I choose from?
+    - What's the role of the Model Page?
+    - How do I configure model settings?
+    - What is dataset splitting in the app?
+    - How do I evaluate model performance?
+    - What metrics are available for model comparison?
+    - How does the Model Page help with predictions?
+    - How do I choose a machine learning model?
+    - What's the importance of preprocessing for modeling?
+    - Where can I build and train models?
+    - How does the Model Page improve predictions?
+
+- intent: ask_about_how_much_your_car_cost_page
+  examples: |
+    - What is the How Much Would Your Car Cost Page?
+    - Tell me about the How Much Would Your Car Cost Page.
+    - What's on the How Much Would Your Car Cost Page?
+    - Explain the How Much Would Your Car Cost Page.
+    - What's the purpose of the How Much Would Your Car Cost Page?
+    - What do I do on the How Much Would Your Car Cost Page?
+    - What's included in the How Much Would Your Car Cost Page?
+    - Can you describe the How Much Would Your Car Cost Page?
+    - How do I estimate car prices?
+    - What inputs are needed for price prediction?
+    - How does the car price estimation work?
+    - Where can I input car details?
+    - How are car prices predicted in the app?
+    - What's the role of preprocessing in price prediction?
+    - How do I find out how much my car costs?
+    - What's the output of the price prediction tool?
+    - Can I predict the price of my dream car?
+    - How does the app estimate car costs?
+    - What happens on the price prediction page?
+
+- intent: ask_about_chatbot_page
+  examples: |
+    - What is the ChatBot Page?
+    - Tell me about the ChatBot Page.
+    - What's on the ChatBot Page?
+    - Explain the ChatBot Page.
+    - What's the purpose of the ChatBot Page?
+    - What do I do on the ChatBot Page?
+    - What's included in the ChatBot Page?
+    - Can you describe the ChatBot Page?
+    - How does the chatbot work?
+    - What's the role of the chatbot in the app?
+    - How do I get car recommendations from the chatbot?
+    - How does the chatbot filter the dataset?
+    - What's the chatbot's purpose?
+    - Can I ask the chatbot about the app?
+    - How do I use the chatbot for guidance?
+    - What's the benefit of using the chatbot?
+    - How do I interact with the chatbot?
+    - What kind of suggestions does the chatbot provide?
+    - Where do I find personalized recommendations?
+    - How does the chatbot help users?
+
+- intent: ask_about_models
+  examples: |
+    - Can you explain the models in the app?
+    - What models are available in the app?
+    - Tell me about the models used for prediction.
+    - How do the models work?
+    - What is Linear Regression?
+    - Can you explain Ridge Regression?
+    - What is Lasso Regression?
+    - Tell me about Decision Tree Regressor.
+    - How does Random Forest Regressor work?
+    - What is XGBoost Regressor?
+    - Can you describe CatBoost Regressor?
+    - What are the differences between the models?
+    - Which model is best for predictions?
+    - How does Linear Regression predict prices?
+    - Explain how Ridge Regression prevents overfitting.
+    - What is the purpose of Lasso Regression?
+    - How do Decision Trees split data?
+    - Why use Random Forest over Decision Tree?
+    - What is the benefit of XGBoost?
+    - How does CatBoost handle categorical data?

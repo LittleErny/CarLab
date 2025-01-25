@@ -9,46 +9,47 @@ stories:
     - intent: car_interested
     - action: utter_car_interested
 
-    - action: utter_ask_price_EUR
+    - action: utter_ask_search_parameters
     - intent: provide_price
       entities:
         - price_EUR: 20000
 
-    - action: utter_ask_vehicle_type
+    - action: utter_more_information
     - intent: provide_vehicle_type
       entities:
         - vehicle_type: suv
 
-    - action: utter_ask_registration_year
+    - action: utter_more_information
     - intent: provide_registration_year
       entities:
         - registration_year: 2018
 
-    - action: utter_ask_transmission
+    - action: utter_more_information
     - intent: provide_transmission
       entities:
         - transmission: automatik
 
-    - action: utter_ask_power_ps
+    - action: utter_more_information
     - intent: provide_power
       entities:
         - power_ps: 150
 
-    - action: utter_ask_odometer_km
+    - action: utter_more_information
     - intent: provide_mileage
       entities:
         - odometer_km: 50000
 
-    - action: utter_ask_fuel_type
+    - action: utter_more_information
     - intent: provide_fuel_type
       entities:
         - fuel_type: diesel
 
-    - action: utter_ask_brand
+    - action: utter_more_information
     - intent: provide_brand
       entities:
         - brand: bmw
 
+    - action: utter_more_information
     - intent: request_recommendation
     - action: action_provide_recommendation
 
@@ -66,41 +67,42 @@ stories:
       entities:
         - price_EUR: 20000
 
-    - action: utter_ask_vehicle_type
+    - action: utter_more_information
     - intent: provide_vehicle_type
       entities:
         - vehicle_type: suv
 
-    - action: utter_ask_registration_year
+    - action: utter_more_information
     - intent: provide_registration_year
       entities:
         - registration_year: 2018
 
-    - action: utter_ask_transmission
+    - action: utter_more_information
     - intent: provide_transmission
       entities:
         - transmission: automatik
 
-    - action: utter_ask_power_ps
+    - action: utter_more_information
     - intent: provide_power
       entities:
         - power_ps: 150
 
-    - action: utter_ask_odometer_km
+    - action: utter_more_information
     - intent: provide_mileage
       entities:
         - odometer_km: 50000
 
-    - action: utter_ask_fuel_type
+    - action: utter_more_information
     - intent: provide_fuel_type
       entities:
         - fuel_type: diesel
 
-    - action: utter_ask_brand
+    - action: utter_more_information
     - intent: provide_brand
       entities:
         - brand: bmw
 
+    - action: utter_more_information
     - intent: request_recommendation
     - action: action_provide_recommendation
 
@@ -110,21 +112,21 @@ stories:
       entities:
         - price_EUR: 20000
 
-    - action: utter_ask_vehicle_type
+    - action: utter_more_information
     - intent: provide_vehicle_type
       entities:
         - vehicle_type: suv
 
-    - action: utter_ask_registration_year
+    - action: utter_more_information
     - intent: provide_registration_year
       entities:
         - registration_year: 2018
 
-    - action: utter_ask_transmission
+    - action: utter_more_information
     - intent: provide_transmission
       entities:
         - transmission: automatik
-    - action: utter_ask_power_ps
+    - action: utter_more_information
     - intent: request_recommendation
     - action: action_provide_recommendation
 

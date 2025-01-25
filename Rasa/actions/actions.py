@@ -7,6 +7,7 @@ from rasa_sdk.types import DomainDict
 from kagglehub import dataset_download
 from difflib import get_close_matches
 
+
 # Load dataset from Kaggle
 path = dataset_download("shaunoilund/auto-sales-ebay-germany-random-50k-cleaned")
 data_path = f"{path}/autos_random_50k_cleaned.csv"

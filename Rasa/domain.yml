@@ -15,6 +15,17 @@ intents:
 - provide_mileage
 - request_recommendation
 
+- ask_about_models
+- ask_about_app_overview
+- ask_about_hello_page
+- ask_about_dataset_page
+- ask_about_parameters_visualisation_page
+- ask_about_preprocessings_page
+- ask_about_faker_page
+- ask_about_model_page
+- ask_about_how_much_your_car_cost_page
+- ask_about_chatbot_page
+
 entities:
 - power_ps
 - fuel_type
@@ -77,7 +88,8 @@ slots:
 
 responses:
   utter_bot_challenge:
-    - text: "I am a RASA-based chatbot, here to help you find the perfect car!"
+    - text: "I am a RASA-based chatbot, here to help you find the perfect car!
+    Also, if you want to know more about the app, just ask me!"
 
   utter_car_interested:
     - text: "Let's find the perfect car for you! What are your preferences?"
@@ -91,29 +103,111 @@ responses:
   utter_thank_you:
     - text: "You're welcome! Let me know if you need anything else."
 
-  utter_ask_price_EUR:
-    - text: "What is your budget in euros (EUR), or would you like me to provide a recommendation right away?"
+  utter_ask_search_parameters:
+    - text: "Could you please provide information about your search preferences? For example:
+        - Budget in euros (EUR)
+        - Desired horsepower (HP)
+        - Type of vehicle (e.g., cabrio, kleinwagen, SUV, kombi, limousine, coupe, bus, andere, Unknown)
+        - Preferred transmission (e.g., manuell, automatik, Unknown)
+        - Fuel type (e.g., unknown, benzin, diesel, lpg, andere, cng, hybrid, elektro)
+        - Specific brand (if any)
+        - Preferred registration year
+        - Maximum mileage (in kilometers)
 
-  utter_ask_power_ps:
-    - text: "What is the horsepower (HP) you are looking for, or would you like me to provide a recommendation right away?"
+        Alternatively, I can provide recommendations right away if you'd like!"
+  
+  utter_more_information:
+    - text: "Do you want to provide more information, or search right away?"
 
-  utter_ask_vehicle_type:
-    - text: "What type of vehicle are you interested in? (e.g., cabrio, kleinwagen, SUV, kombi, limousine, coupe, bus, andere, Unknown) Or would you like me to provide a recommendation right away?"
+  
+  
+  
+  
+  utter_app_overview:
+    - text: "Welcome to the CarLab App 🚗💻! Here's what you can do here:
+        
+        - **Hello Page**: Get an overview of the project, choose between Beginner and Hardcore modes, and access useful resources.
+        - **Dataset Page**: Explore the Auto Sales Dataset, view or download it, and learn about its columns and structure.
+        - **Parameters Visualisation Page**: Analyze the dataset with customizable charts and markdown notes.
+        - **Preprocessings Page**: Perform preprocessing actions like removing outliers, label encoding, and scaling to prepare the data for modeling.
+        - **Faker Page**: Generate synthetic data to expand the dataset for testing and exploration.
+        - **Model Page**: Select, configure, and train machine learning models to predict car prices.
+        - **How Much Would Your Car Cost Page**: Estimate the price of a car based on its features using a trained model.
+        - **ChatBot Page**: Use this chatbot to get personalized car recommendations and app guidance.
+        
+        Let me know if you'd like to learn more about any specific feature! 📋"
 
-  utter_ask_transmission:
-    - text: "What type of transmission do you prefer? (e.g., manuell, automatik, Unknown) Or would you like me to provide a recommendation right away?"
+  utter_hello_page:
+    - text: "The **Hello Page** is your starting point! 🚗💻
+        - Learn about the app and its dataset.
+        - Choose between Beginner or Hardcore modes to guide your experience.
+        - Access helpful resources: Dataset, GitHub, and Wiki."
 
-  utter_ask_fuel_type:
-    - text: "What type of fuel are you looking for? (e.g., unknown, benzin, diesel, lpg, andere, cng, hybrid, elektro) Or would you like me to provide a recommendation right away?"
+  utter_dataset_page:
+    - text: "The **Dataset Page** gives an overview of the Auto Sales Dataset. 📊
+        - View or download ~38K cleaned records of car sales from eBay Germany.
+        - Explore details about numerical and categorical columns.
+        - Learn how the dataset was prepared for analysis."
 
-  utter_ask_brand:
-    - text: "Do you have a specific brand in mind, or would you like me to provide a recommendation right away?"
+  utter_parameters_visualisation_page:
+    - text: "The **Parameters Visualisation Page** helps you explore the dataset. 📈
+        - Create and edit charts to analyze data distributions and correlations.
+        - Use Markdown boxes for notes or descriptions.
+        - Data is auto-saved, so you can return anytime."
 
-  utter_ask_registration_year:
-    - text: "What is the preferred registration year for the car you are looking for, or would you like me to provide a recommendation right away?"
+  utter_preprocessings_page:
+    - text: "The **Preprocessings Page** prepares your dataset for modeling. 🔧
+        - Remove outliers to focus on relevant data.
+        - Apply label encoding to convert categorical values.
+        - Use scaling to normalize numerical features."
 
-  utter_ask_odometer_km:
-    - text: "What is the maximum mileage (in kilometers) you are willing to consider, or would you like me to provide a recommendation right away?"
+  utter_faker_page:
+    - text: "The **Faker Page** allows you to generate synthetic data. 🤖
+        - Choose **Random** or **Proportional** methods to add fake data.
+        - Adjust ranges for mileage and price to match your needs.
+        - Augmented data impacts preprocessing and visualizations."
+
+  utter_model_page:
+    - text: "The **Model Page** lets you train machine learning models. 📊
+        - Choose from models like Linear Regression, Decision Trees, or XGBoost.
+        - Adjust dataset split settings for training, validation, and testing.
+        - Compare model performance with metrics like MSE and NMSE."
+
+  utter_how_much_your_car_cost_page:
+    - text: "The **How Much Would Your Car Cost** page predicts car prices. 🚗💰
+        - Input car details like type, engine power, and mileage.
+        - The app applies preprocessing automatically based on your settings.
+        - Get an estimated price for your dream car."
+
+  utter_chatbot_page:
+    - text: "The **ChatBot Page** connects you with a smart assistant. 🤖
+        - Get tailored car recommendations based on your preferences.
+        - Save time by letting the bot filter the dataset for you.
+        - Learn about the app and its features through the bot."
+
+  utter_information_request:
+    - text: "I can help you learn about the app's features and pages. 📋
+        Feel free to ask me about any specific page or feature you want to explore!"
+
+  utter_explain_models:
+    - text: "Here's a quick explanation of the models available in the app:
+          
+          1. **Linear Regression**: A basic model that predicts prices by drawing a straight line through the data. It’s ideal for simple relationships between features and prices.
+          
+          2. **Ridge Regression**: Similar to Linear Regression but includes a penalty to avoid overfitting. This is helpful when dealing with many features or related ones.
+          
+          3. **Lasso Regression**: Adds simplicity by removing unimportant features, making it useful when there are many irrelevant variables.
+          
+          4. **Decision Tree Regressor**: Predicts by asking a series of 'yes/no' questions, dividing data into groups. Good for patterns but prone to overfitting without limits.
+          
+          5. **Random Forest Regressor**: Combines many Decision Trees to improve accuracy and stability. It’s more robust but requires more time and memory.
+          
+          6. **XGBoost Regressor**: Stands for eXtreme Gradient Boosting. It creates trees iteratively, learning from errors to improve predictions. It’s fast and powerful.
+          
+          7. **CatBoost Regressor**: Designed for data with categorical features. It processes categories automatically and reduces overfitting with a unique boosting technique.
+
+          Let me know if you want more details about any specific model!"
+
 
 actions:
 - action_provide_recommendation
