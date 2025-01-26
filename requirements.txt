@@ -9,3 +9,5 @@ requests
 scikit-learn
 xgboost
 catboost
+rasa==3.6.20
+
