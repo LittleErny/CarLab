@@ -61,7 +61,6 @@ If you want to see the data description, as well as approaches of handling outli
 
 
 ## Basic Usage
-#### Explain how to start and use the project. Include steps for:
 
 **Running the application:**
 
@@ -87,10 +86,10 @@ If you want to see the data description, as well as approaches of handling outli
 
 ## Implementation of the Requests
 
-All the request are fully implemented. To see more detailed info, please visit Wiki. ToDo: add link here.
+All the request are fully implemented. To see more detailed info, please visit [this](https://mygit.th-deg.de/ma06524/sas-thd/-/wikis/Implementation-of-Requests) Wiki page.
 
 ## Work Done
-The work was split in the following way:
+Generally, the work was split in the following way:
 - Mikhail Avrutskii (2 accounts on Git: `LittleErny` & `Mikhail Avrutskii`)
     - Graphical User Interface & Visualization
     - General Data analysis
@@ -100,3 +99,8 @@ The work was split in the following way:
     - Scikit-Learn
     - Dialog flow
 
+However, refer to [this](https://mygit.th-deg.de/ma06524/sas-thd/-/wikis/Implementation-of-Requests) Wiki page to see the exact work split.
+
+## Video Demonstration
+
+You can find the video demostration of our project [here](https://mygit.th-deg.de/ma06524/sas-thd/-/tree/main/Video%20Demonstration).
