@@ -61,9 +61,29 @@ If you want to see the data description, as well as approaches of handling outli
 
 
 ## Basic Usage
-ToDo:
-Explain how to start and use the project. Include steps for:
-- Running the application.
+#### Explain how to start and use the project. Include steps for:
+
+**Running the application:**
+
+1. Open a terminal on your system.
+2. Navigate to the project folder using the `cd` command. For example:
+   ```bash
+   cd /path/to/project-folder
+   ```
+3. Run the following command to start the application:
+   ```bash
+   streamlit run Hello.py
+   ```
+4. Once the application is running, a browser window should open automatically displaying the app. If not, you can copy the provided URL from the terminal and paste it into your browser.
+
+**Using the Rasa ChatBot:**
+
+1. Navigate to the **ChatBot** page in the Streamlit application.
+2. When you access this page, two additional terminal windows will appear:
+   - One for the Rasa server.
+   - Another for the Rasa action server.
+3. Wait until both terminals display a success message indicating that the Rasa ChatBot is ready.
+4. Once both terminals show success messages, you can start chatting with the ChatBot directly from the application.
 
 ## Implementation of the Requests
 
