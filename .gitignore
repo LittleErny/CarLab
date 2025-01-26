@@ -5,20 +5,3 @@
 
 __pycache__*
 *.py[cod]
-
-
-*.log
-*.tmp
-*.swp
-*.bak
-*.orig
-
-*.txt
-backups/
-catboost_info/
-
-# Rasa
-.rasa/
-Rasa/.rasa/
-tracker.db
-models/
