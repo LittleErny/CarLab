@@ -241,14 +241,11 @@ def do_preprocessing(param_name: str, param_value):
 
             # If it was scaling:
             if action["preproc_type"] == PreprocessingTypes.SCALING:
-                print("SCALIIIIING!")
                 if action["scaling_method"] == "Min-Max Scaling":
                     mini, maxi = action["min"], action["max"]
-                    print("MIN-MAX", mini, maxi, (param_value - mini) / (maxi - mini))
                     return (param_value - mini) / (maxi - mini)
                 elif action["scaling_method"] == "Standard Scaling":
                     mean, std = action["mean"], action["std"]
-                    print("STD", mean, std, (param_value - mean) / std)
                     return (param_value - mean) / std
                 else:
                     raise ValueError(f"Unknown scaling_method: {action['scaling_method']}")
@@ -282,7 +279,7 @@ def reverse_preprocessing(param_name: str, param_value):
                     return param_value * (maxi - mini) + mini
                 elif action["scaling_method"] == "Standard Scaling":
                     mean, std = action["mean"], action["std"]
-                    print("STD", mean, std, (param_value - mean) / std)
+                    # print("STD", mean, std, (param_value - mean) / std)
                     return param_value * std + mean
                 else:
                     raise ValueError(f"Unknown scaling_method: {action['scaling_method']}")

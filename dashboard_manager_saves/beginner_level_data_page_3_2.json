@@ -17,7 +17,7 @@
     },
     "2": {
         "type": "MD_BOX",
-        "content": "Then let's check the distribution of some numerical parameters after removing top 1% of their rows: ",
+        "content": "Then let's check the distribution of some numerical parameters after removing their outliers: ",
         "manager_page_number": "3",
         "mode": "MdBoxModes.VIEW"
     },

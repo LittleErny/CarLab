@@ -50,24 +50,25 @@ def render_sidebar_preprocessing_config_bar():
     st.sidebar.button("🔄 Update Charts",
                       on_click=reload_charts)
 
-    st.sidebar.write("- - -")
     # Uncomment this to be able to edit saved manager states
-    if st.sidebar.button("Save current page state"):
-        preproc_manager.save_to_json("dashboard_manager_saves/beginner_level_data_page_3_1.json")
-        manager.save_to_json("dashboard_manager_saves/beginner_level_data_page_3_2.json")
-
-    if st.sidebar.button("Load page from json"):
-        preproc_manager.load_from_json(update_item_state_in_preproc_manager,
-                                       df,
-                                       "dashboard_manager_saves/beginner_level_data_page_3_1.json",
-                                       skip_rerun=True  # as we need to load one more manager
-                                       )
-
-        manager.load_from_json(update_item_state,
-                               df,
-                               "dashboard_manager_saves/beginner_level_data_page_3_2.json")
-
-    st.sidebar.write("- - -")
+    # st.sidebar.write("- - -")
+    #
+    # if st.sidebar.button("Save current page state"):
+    #     preproc_manager.save_to_json("dashboard_manager_saves/beginner_level_data_page_3_1.json")
+    #     manager.save_to_json("dashboard_manager_saves/beginner_level_data_page_3_2.json")
+    #
+    # if st.sidebar.button("Load page from json"):
+    #     preproc_manager.load_from_json(update_item_state_in_preproc_manager,
+    #                                    df,
+    #                                    "dashboard_manager_saves/beginner_level_data_page_3_1.json",
+    #                                    skip_rerun=True  # as we need to load one more manager
+    #                                    )
+    #
+    #     manager.load_from_json(update_item_state,
+    #                            df,
+    #                            "dashboard_manager_saves/beginner_level_data_page_3_2.json")
+    #
+    # st.sidebar.write("- - -")
 
     st.sidebar.selectbox(
         "Please select the type of Preprocessing action:", PREPROCESSING_OPTIONS,

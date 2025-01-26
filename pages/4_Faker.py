@@ -49,6 +49,7 @@ def generate_proportional_data(num_rows, df):
     transmission_probs = df['transmission'].value_counts(normalize=True).to_dict()
     fuel_type_probs = df['fuel_type'].value_counts(normalize=True).to_dict()
     brand_probs = df['brand'].value_counts(normalize=True).to_dict()
+    damage_probs = df['unrepaired_damage'].value_counts(normalize=True).to_dict()
 
     price_mean, price_std = df['price_EUR'].mean(), df['price_EUR'].std()
     odometer_mean, odometer_std = df['odometer_km'].mean(), df['odometer_km'].std()
@@ -69,8 +70,8 @@ def generate_proportional_data(num_rows, df):
             "odometer_km": max(0, int(random.gauss(odometer_mean, odometer_std))),
             "fuel_type": random.choices(list(fuel_type_probs.keys()), weights=fuel_type_probs.values(), k=1)[0],
             "brand": random.choices(list(brand_probs.keys()), weights=brand_probs.values(), k=1)[0],
-            "unrepaired_damage": fake.random_element(["ja", "nein", "Unknown"]),
-            "postal_code": random.randint(10000, 99999),
+            "unrepaired_damage": random.choices(list(damage_probs.keys()), weights=damage_probs.values(), k=1)[0],
+            "postal_code": random.randint(10000, 99999),  # The distribution is pretty equal, so keep it so
         }
         data.append(row)
     return pd.DataFrame(data)
