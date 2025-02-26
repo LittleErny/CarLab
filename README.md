@@ -1,12 +1,10 @@
-Student 1: `Avrutskii, Mikhail`, `12306524`
-
-Student 2: `Safronov, Mikhail`, `22305205`
-
 # CarLab
 
-[Link to the MyGit Repo](https://mygit.th-deg.de/ma06524/sas-thd)
+The project was implemented by me, [Mikhail Avrutskii](https://github.com/LittleErny), and [Mikhail Safronov](https://github.com/MikeSafronov42) as a part of Assistance Systems course at [Deggendorf Institute of Technology](https://th-deg.de/en).  
 
-[Link to the MyGit Wiki](https://mygit.th-deg.de/ma06524/sas-thd/-/wikis/home)
+[Link to the initial MyGit Repo](https://mygit.th-deg.de/ma06524/sas-thd)
+
+[Link to the initial MyGit Wiki](https://mygit.th-deg.de/ma06524/sas-thd/-/wikis/home)
 
 ## Project Description
 Our project fulfills several objectives:
@@ -84,13 +82,9 @@ If you want to see the data description, as well as approaches of handling outli
 3. Wait until both terminals display a success message indicating that the Rasa ChatBot is ready.
 4. Once both terminals show success messages, you can start chatting with the ChatBot directly from the application.
 
-## Implementation of the Requests
-
-All the request are fully implemented. To see more detailed info, please visit [this](https://mygit.th-deg.de/ma06524/sas-thd/-/wikis/Implementation-of-Requests) Wiki page.
-
-## Work Done
+## The split of the roles in the project
 Generally, the work was split in the following way:
-- Mikhail Avrutskii (2 accounts on Git: `LittleErny` & `Mikhail Avrutskii`)
+- Mikhail Avrutskii (2 usernames on Git: `LittleErny` & `Mikhail Avrutskii`)
     - Graphical User Interface & Visualization
     - General Data analysis
     - Sample dialogs
